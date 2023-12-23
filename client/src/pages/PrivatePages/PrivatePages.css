@@ -1,0 +1,80 @@
+.game-page-container {
+    width: 1920px !important;
+    height: 1070px !important;
+
+    background-image: url('/board.jpg') !important;
+
+    display: flex;
+}
+
+/* LEFT SIDE */
+.left-side {
+    width: 490px;
+    height: 100%;
+    border: #fff solid 1px;
+}
+.general-player0,
+.general-player1 {
+    width: 100px;
+    height: 130px;
+    border: #fff solid 1px;
+    margin-left: 137px;
+}
+.general-player0 {
+    margin-top: 80px;
+}
+.general-player1 {
+    margin-top: 247px;
+}
+.weather-box {
+    width: 280px;
+    height: 130px;
+    border: #fff solid 1px;
+    margin-left: 137px;
+    margin-top: 240px;
+}
+
+/* CENTER SIDE */
+.center-side {
+    width: 1030px;
+    height: 100%;
+    border: #fff solid 1px;
+}
+.row-box-player0,
+.row-box-player1 {
+    width: 100%;
+    height: 418px;
+    border: #73ff56 solid 1px;
+}
+.row {
+    width: 950px;
+    height: 110px;
+    border: #fff solid 1px;
+    margin-left: 70px;
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: center;
+}
+
+.row-box-cards {
+    width: 100%;
+    height: 130px;
+    border: #73ff56 solid 1px;
+}
+
+.row-cards {
+    width: 940px;
+    height: 130px;
+    border: #fff solid 1px;
+    margin-left: 80px;
+
+    display: flex;
+}
+
+/* RIGHT SIDE */
+.right-side {
+    width: 390px;
+    height: 100%;
+    border: #fff solid 1px;
+}
