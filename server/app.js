@@ -33,10 +33,10 @@ io.use((socket, next) => {
 io.on('connection', async (socket) => {
     try {
         //connection event
-        await User.findByIdAndUpdate(
-            { _id: socket.userId },
-            { socketId: socket.id }
-        )
+        // await User.findByIdAndUpdate(
+        //     { _id: socket.userId },
+        //     { socketId: socket.id }
+        // )
         console.log('user connected: ', socket.userId, socket.id)
 
         //socket events
