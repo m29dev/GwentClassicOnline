@@ -48,11 +48,22 @@
 }
 .row {
     width: 950px;
-    height: 110px;
-    border: #fff solid 1px;
+    height: 120px;
+    /* border: #fff solid 1px; */
     margin-left: 70px;
-    margin-top: 20px;
-
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+.row-special-card-box {
+    width: 140px;
+    /* border: #fff solid 1px; */
+    display: flex;
+    justify-content: center;
+}
+.row-common-card-box {
+    width: 810px;
+    /* border: #fff solid 1px; */
     display: flex;
     justify-content: center;
 }
@@ -70,6 +81,8 @@
     margin-left: 80px;
 
     display: flex;
+    justify-content: center;
+    overflow: scroll;
 }
 
 /* RIGHT SIDE */

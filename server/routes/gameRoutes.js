@@ -6,7 +6,7 @@ const router = express.Router()
 router.post('/api/game/create', controller.game_create)
 
 // // READ GAME
-// router.get('/api/game/read/:id', controller.game_read_id)
+router.get('/api/game/read/:id', controller.game_read_id)
 
 // // UPDADTE GAME
 // router.post('/api/game/update/:id', controller.game_update_id)

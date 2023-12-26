@@ -1,0 +1,109 @@
+.card {
+    width: 90px !important;
+    height: 120px !important;
+    min-width: 90px !important;
+    min-height: 120px !important;
+    margin-left: 2px;
+    margin-right: 2px;
+
+    background-position: center;
+    background-size: cover;
+
+    position: relative;
+}
+.card:hover {
+    border: 0.5px solid rgba(255, 214, 34, 0.555);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.card-details {
+    width: 310px;
+    height: 580px;
+
+    background-position: center;
+    background-size: cover;
+
+    position: absolute;
+    top: 230px;
+    left: 1540px;
+    z-index: 100;
+    border-radius: 30px;
+}
+
+.card-power-box {
+    width: 30px;
+    height: 30px;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+.card-power {
+    text-align: center;
+    color: black;
+}
+
+.card-power-hero-box {
+    width: 60px;
+    height: 60px;
+    background-position: center;
+    background-size: cover;
+    /* display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center; */
+
+    position: absolute;
+    top: -4px;
+    left: -4px;
+}
+.card-power-hero {
+    /* width: 40px;
+    height: 40px; */
+    text-align: center;
+    color: rgb(255, 255, 255);
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+
+    position: absolute;
+    top: 12px;
+    left: 13px;
+}
+
+.card-row-box {
+    width: 30px;
+    height: 30px;
+    /* margin-top: calc(100% - 35px);
+    margin-left: calc(100% - 30px); */
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+
+    position: absolute;
+    top: 85px;
+    left: 60px;
+}
+
+.card-ability-box {
+    width: 30px;
+    height: 30px;
+    /* margin-top: calc(100% - 35px);
+    margin-left: calc(100% - 30px); */
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+
+    position: absolute;
+    top: 85px;
+    left: 27px;
+}

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useUserConnectMutation } from '../../services/authService'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setUserInfo } from '../../redux/authSlice'
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 import { Button } from 'react-bootstrap'
 
 const AuthPage = () => {
     const [nickname, setNickname] = useState('')
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const { userInfo } = useSelector((state) => state.auth)
+    // const navigate = useNavigate()
+    // const { userInfo } = useSelector((state) => state.auth)
 
     const [userConnect] = useUserConnectMutation()
     const onConnect = useCallback(
@@ -28,8 +28,13 @@ const AuthPage = () => {
     )
 
     useEffect(() => {
-        if (userInfo) navigate('/home')
-    }, [userInfo, navigate])
+        // if (userInfo) navigate('/home')
+        dispatch(
+            setUserInfo({
+                nickname: 'JJ',
+            })
+        )
+    }, [dispatch])
 
     return (
         <>
