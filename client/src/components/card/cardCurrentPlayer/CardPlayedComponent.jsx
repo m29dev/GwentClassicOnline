@@ -8,6 +8,13 @@ const CardPlayedComponent = (card) => {
                 backgroundImage: `url("./sm/${card?.card?.deck}_${card?.card?.filename}.jpg")`,
             }}
         >
+            <div
+                className="card-border"
+                style={{
+                    backgroundImage: `url("./icons/border_gold.png")`,
+                }}
+            ></div>
+
             {/* display strength normal icon if card has no ability */}
             {card?.card?.strength && card?.card?.ability !== 'hero' && (
                 <div
