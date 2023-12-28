@@ -67,7 +67,7 @@ const game_read_id = async (req, res) => {
             player_leader: selectedLeader, // deck leader selected by player
 
             // variable info, update each play / each round
-
+            player_card_selected: {},
             player_cards_current: starterCards, // all cards YET to play
             player_cards_played: [], // add each played card here
 
@@ -103,7 +103,11 @@ const game_read_id = async (req, res) => {
             ],
         }
 
-        const gameInfo = [player_0, player_1]
+        // const gameInfo = [player_0, player_1]
+        const gameInfo = {
+            player_current: player_0,
+            player_opp: player_1,
+        }
 
         res.json(gameInfo)
     } catch (err) {
