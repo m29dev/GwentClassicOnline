@@ -12,34 +12,42 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }),
         }),
 
-        roomUserJoin: builder.mutation({
+        roomRead: builder.mutation({
             query: (data) => ({
-                url: `${ROOM_URL}/user/join`,
-                method: 'POST',
-                body: data,
-            }),
-        }),
-
-        saveGameData: builder.mutation({
-            query: (data) => ({
-                url: `${ROOM_URL}/data/save`,
-                method: 'POST',
-                body: data,
-            }),
-        }),
-
-        getGameData: builder.mutation({
-            query: (roomId) => ({
-                url: `${ROOM_URL}/data/get/${roomId}`,
+                url: `${ROOM_URL}/read/${data?.roomInfoId}/${data?.userInfoId}`,
                 method: 'GET',
             }),
         }),
+
+        // roomUserJoin: builder.mutation({
+        //     query: (data) => ({
+        //         url: `${ROOM_URL}/user/join`,
+        //         method: 'POST',
+        //         body: data,
+        //     }),
+        // }),
+
+        // saveGameData: builder.mutation({
+        //     query: (data) => ({
+        //         url: `${ROOM_URL}/data/save`,
+        //         method: 'POST',
+        //         body: data,
+        //     }),
+        // }),
+
+        // getGameData: builder.mutation({
+        //     query: (roomId) => ({
+        //         url: `${ROOM_URL}/data/get/${roomId}`,
+        //         method: 'GET',
+        //     }),
+        // }),
     }),
 })
 
 export const {
     useRoomCreateMutation,
-    useRoomUserJoinMutation,
-    useSaveGameDataMutation,
-    useGetGameDataMutation,
+    useRoomReadMutation,
+    // useRoomUserJoinMutation,
+    // useSaveGameDataMutation,
+    // useGetGameDataMutation,
 } = authApiSlice

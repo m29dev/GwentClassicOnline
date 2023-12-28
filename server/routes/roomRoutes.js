@@ -1,12 +1,12 @@
 const express = require('express')
-const controller = require('../controllers/gameController.js')
+const controller = require('../controllers/roomController.js')
 const router = express.Router()
 
-// CREATE / UPDATE GAME INIT INFO
-router.post('/api/game/init', controller.game_init)
+// CREATE ROOM
+router.post('/api/rooms/create', controller.room_create)
 
-// // READ GAME
-router.get('/api/game/read/:id', controller.game_read_id)
+// // READ ROOM
+router.get('/api/rooms/read/:roomId/:userId', controller.room_read)
 
 // // UPDADTE GAME
 // router.post('/api/game/update/:id', controller.game_update_id)

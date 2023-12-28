@@ -5,6 +5,7 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const dbConnect = require('./config/dbConfig')
 const gameRoutes = require('./routes/gameRoutes')
+const roomRoutes = require('./routes/roomRoutes')
 const http = require('http')
 
 dotenv.config()
@@ -56,3 +57,4 @@ app.get('/api', (req, res) => {
 
 //routes
 app.use(gameRoutes)
+app.use(roomRoutes)

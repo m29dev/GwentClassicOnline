@@ -1,22 +1,44 @@
 const Game = require('../models/Game')
 const cards = require('../config/cardsConfig')
+const { getFaction } = require('../config/factionConfig')
 
-const game_create = async (req, res) => {
+const game_init = async (req, res) => {
     try {
-        const data = req.body
+        const { gameId, faction, playerId, playerNickname } = req.body
+        const deck = await getFaction(faction)
 
-        console.log(data)
+        const game = await Game.findById({ _id: gameId })
+        console.log(game)
 
-        const newGame = new Game({
-            players: [],
-            round: 1,
-            stats: [],
-            active: true,
-        })
+        if (game?.gameInfo?.length >= 2)
+            return console.log('game info already initialized')
 
-        const newGameCreated = await newGame.save()
+        const player_0 = {
+            // constant info
+            // player_id: 0, ADD LATER AN ID WITH NICKNAME
+            player_name: playerNickname,
+            player_deck: faction, // deck name: Northern Realms
+            player_deck_cards_all: deck?.selectedDeck, // deck cards, all of selected cards by player
+            player_leader: deck?.selectedLeader, // deck leader selected by player
 
-        res.json(newGameCreated)
+            // variable info, update each play / each round
+            player_card_selected: {},
+            player_cards_current: deck?.starterCards, // all cards YET to play
+            player_cards_played: [], // add each played card here
+
+            // variable info, clear each round
+            player_cards_board: [
+                // cards played for each row on the board
+                { board_row: 'close', board_row_cards: [] },
+                { board_row: 'ranged', board_row_cards: [] },
+                { board_row: 'siege', board_row_cards: [] },
+            ],
+        }
+
+        game.gameInfo.push(player_0)
+        const initGame = await game.save()
+
+        res.json(initGame)
     } catch (err) {
         console.log(err)
     }
@@ -116,6 +138,6 @@ const game_read_id = async (req, res) => {
 }
 
 module.exports = {
-    game_create,
+    game_init,
     game_read_id,
 }

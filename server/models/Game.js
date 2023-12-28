@@ -1,18 +1,14 @@
 const mongoose = require('mongoose')
 const gameSchema = mongoose.Schema(
     {
-        players: {
+        gameInfo: {
             type: Array,
             default: [],
         },
-        round: {
+        gameRound: {
             type: Number,
         },
-        stats: {
-            type: Array,
-            default: [],
-        },
-        active: {
+        gameActive: {
             type: Boolean,
         },
     },

@@ -4,6 +4,16 @@ const GAME_URL = '/game'
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
+        // CREATE / UPDATE GAME INFO (INIT DATA LIKE FACTION CHOOSING ETC)
+        gameInit: builder.mutation({
+            query: (data) => ({
+                url: `${GAME_URL}/init`,
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // READ GAME BY ID
         gameReadId: builder.mutation({
             query: () => ({
                 url: `${GAME_URL}/read/${'id'}`,
@@ -11,6 +21,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
             }),
         }),
 
+        // PLAY A CARD (change later for a socket.io action)
         gamePlayCard: builder.mutation({
             query: () => ({
                 url: `${GAME_URL}/play/card`,
@@ -20,4 +31,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 })
 
-export const { useGameReadIdMutation, useGamePlayCardMutation } = authApiSlice
+export const {
+    useGameInitMutation,
+    useGameReadIdMutation,
+    useGamePlayCardMutation,
+} = authApiSlice
