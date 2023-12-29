@@ -91,7 +91,61 @@ const handleGameStart = async () => {
     console.log('game start')
 }
 
+const handleGameCardPlay = async (socket, room_id, game_id, cardSelected) => {
+    const game = await Game.findById({ _id: game_id })
+    let gameInfoEdit
+    let gameInfoEditOpp
+    game.gameInfo.forEach((item) => {
+        if (item.player_name === socket.userId) {
+            gameInfoEdit = item
+        } else {
+            gameInfoEditOpp = item
+        }
+    })
+
+    // REMOVE PLAYED CARD FROM CURRENT CARDS
+    let updatedArray = []
+    gameInfoEdit?.player_cards_current?.map((item) => {
+        if (item?.id !== cardSelected?.id) {
+            updatedArray.push(item)
+        }
+    })
+    gameInfoEdit.player_cards_current = updatedArray
+    // ADD PLAYED CARD TO THE BOARD ARRAY
+    gameInfoEdit.player_cards_board.map((row) => {
+        if (row?.board_row === cardSelected?.row) {
+            row.board_row_cards.push(cardSelected)
+        }
+    })
+    // REMOVE CARD SELECTED AFTER THE PLAY
+    gameInfoEdit.player_card_selected = {}
+
+    const updateGame = await Game.findByIdAndUpdate(
+        { _id: game_id },
+        { gameInfo: [gameInfoEdit, gameInfoEditOpp] }
+    )
+
+    // SEND DATA TO OPP PLAYER
+    const gameInfoOpp = {
+        gameActive: true,
+        gameRound: game.gameRound,
+        gamePlayerCurrent: gameInfoEditOpp,
+        gamePlayerOpponent: gameInfoEdit,
+    }
+    socket.to(room_id).emit('gameInfoData', gameInfoOpp)
+
+    // SEND DATA TO CURR PLAYER socket.user_id
+    const gameInfoCurr = {
+        gameActive: true,
+        gameRound: game.gameRound,
+        gamePlayerCurrent: gameInfoEdit,
+        gamePlayerOpponent: gameInfoEditOpp,
+    }
+    socket.nsp.to(socket.id).emit('gameInfoData', gameInfoCurr)
+}
+
 module.exports = {
     handleGameInitFaction,
     handleGameStart,
+    handleGameCardPlay,
 }

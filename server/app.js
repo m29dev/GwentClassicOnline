@@ -11,6 +11,7 @@ const { handleRoomJoin } = require('./config/socketRoomConfig')
 const {
     handleGameStart,
     handleGameInitFaction,
+    handleGameCardPlay,
 } = require('./config/socketGameConfig')
 
 dotenv.config()
@@ -50,6 +51,14 @@ io.on('connection', async (socket) => {
         socket.on('gameInitFaction', async ({ room_id, game_id, faction }) => {
             await handleGameInitFaction(socket, room_id, game_id, faction)
         })
+
+        // on card play
+        socket.on(
+            'gameCardPlay',
+            async ({ room_id, game_id, cardSelected }) => {
+                await handleGameCardPlay(socket, room_id, game_id, cardSelected)
+            }
+        )
 
         // on start the game
         socket.on('gameStart', async ({ room_id }) => {
