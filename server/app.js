@@ -7,6 +7,11 @@ const dbConnect = require('./config/dbConfig')
 const gameRoutes = require('./routes/gameRoutes')
 const roomRoutes = require('./routes/roomRoutes')
 const http = require('http')
+const { handleRoomJoin } = require('./config/socketRoomConfig')
+const {
+    handleGameStart,
+    handleGameInitFaction,
+} = require('./config/socketGameConfig')
 
 dotenv.config()
 app.use(cors())
@@ -19,7 +24,7 @@ const server = http.createServer(app)
 const io = require('socket.io')(server, {
     allowEIO3: true,
     cors: {
-        origin: 'http://localhost:5173',
+        origin: ['http://localhost:5173'],
         methods: ['GET', 'POST'],
     },
 })
@@ -33,14 +38,35 @@ io.use((socket, next) => {
 })
 io.on('connection', async (socket) => {
     try {
-        //connection event
-        // await User.findByIdAndUpdate(
-        //     { _id: socket.userId },
-        //     { socketId: socket.id }
-        // )
+        // connection event
         console.log('user connected: ', socket.userId, socket.id)
 
-        //socket events
+        // on room join
+        socket.on('roomJoin', async ({ room_id }) => {
+            await handleRoomJoin(socket, room_id)
+        })
+
+        // on send init faction data (player chooses faction)
+        socket.on('gameInitFaction', async ({ room_id, game_id, faction }) => {
+            await handleGameInitFaction(socket, room_id, game_id, faction)
+        })
+
+        // on start the game
+        socket.on('gameStart', async ({ room_id }) => {
+            await handleGameStart(room_id)
+        })
+
+        // on end the game
+        socket.on('gameEnd', async ({ room_id }) => {
+            const res = await Room.findOne({ room_id })
+            socket.nsp.to(room_id).emit('endGameRoom', res)
+        })
+
+        // disconnection event
+        socket.on('disconnect', () => {
+            console.log('user disconnected: ', socket.userId)
+            socket.to(socket.id).emit('onDisconnect')
+        })
     } catch (err) {
         console.log(err)
     }

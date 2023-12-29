@@ -4,41 +4,69 @@ const { getFaction } = require('../config/factionConfig')
 
 const game_init = async (req, res) => {
     try {
-        const { gameId, faction, playerId, playerNickname } = req.body
-        const deck = await getFaction(faction)
+        // const { gameId, faction, playerId, playerNickname } = req.body
+        // const deck = await getFaction(faction)
 
-        const game = await Game.findById({ _id: gameId })
-        console.log(game)
+        // const game = await Game.findById({ _id: gameId })
 
-        if (game?.gameInfo?.length >= 2)
-            return console.log('game info already initialized')
+        // // check if gameInfo has already 2 players info
+        // if (game?.gameInfo?.length >= 2)
+        //     return console.log('game info already initialized')
 
-        const player_0 = {
-            // constant info
-            // player_id: 0, ADD LATER AN ID WITH NICKNAME
-            player_name: playerNickname,
-            player_deck: faction, // deck name: Northern Realms
-            player_deck_cards_all: deck?.selectedDeck, // deck cards, all of selected cards by player
-            player_leader: deck?.selectedLeader, // deck leader selected by player
+        // // check if player who send the request already has the gameInfo object
+        // let cancel = false
+        // game.gameInfo.forEach((item) => {
+        //     if (item.player_name === playerNickname) {
+        //         console.log(playerNickname, 'already has a gameInfo object')
+        //         cancel = true
+        //     }
+        // })
+        // if (cancel) return
 
-            // variable info, update each play / each round
-            player_card_selected: {},
-            player_cards_current: deck?.starterCards, // all cards YET to play
-            player_cards_played: [], // add each played card here
+        // const player_0 = {
+        //     // constant info
+        //     // player_id: 0, ADD LATER AN ID WITH NICKNAME
+        //     player_name: playerNickname,
+        //     player_deck: faction, // deck name: Northern Realms
+        //     player_deck_cards_all: deck?.selectedDeck, // deck cards, all of selected cards by player
+        //     player_leader: deck?.selectedLeader, // deck leader selected by player
 
-            // variable info, clear each round
-            player_cards_board: [
-                // cards played for each row on the board
-                { board_row: 'close', board_row_cards: [] },
-                { board_row: 'ranged', board_row_cards: [] },
-                { board_row: 'siege', board_row_cards: [] },
-            ],
-        }
+        //     // variable info, update each play / each round
+        //     player_card_selected: {},
+        //     player_cards_current: deck?.starterCards, // all cards YET to play
+        //     player_cards_played: [], // add each played card here
 
-        game.gameInfo.push(player_0)
-        const initGame = await game.save()
+        //     // variable info, clear each round
+        //     player_cards_board: [
+        //         // cards played for each row on the board
+        //         { board_row: 'close', board_row_cards: [] },
+        //         { board_row: 'ranged', board_row_cards: [] },
+        //         { board_row: 'siege', board_row_cards: [] },
+        //     ],
+        // }
 
-        res.json(initGame)
+        // game.gameInfo.push(player_0)
+        // const initGame = await game.save()
+
+        // let playerOpp
+        // initGame.gameInfo.forEach((item) => {
+        //     if (item.player_name !== playerNickname) {
+        //         return (playerOpp = item)
+        //     }
+        // })
+
+        // const gameInfoObject = {
+        //     gameActive: initGame.gameActive,
+        //     gameRound: initGame.gameActive,
+        //     gamePlayerCurrent: player_0,
+        //     gamePlayerOpponent: playerOpp ? playerOpp : {},
+        // }
+
+        // // if 2 player objects exists, call socket event to start the
+
+        // res.json(gameInfoObject)
+
+        console.log('game_init_post')
     } catch (err) {
         console.log(err)
     }

@@ -36,7 +36,9 @@ const room_read = async (req, res) => {
         console.log('ROOM_READ')
         const { roomId, userId } = req.params
 
+        if (roomId?.length < 24) return
         const room = await Room.findById({ _id: roomId })
+
         res.json(room)
     } catch (err) {
         console.log(err)
