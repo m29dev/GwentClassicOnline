@@ -5,13 +5,13 @@ const CardPlayedComponent = (card) => {
         <div
             className="card"
             style={{
-                backgroundImage: `url("./sm/${card?.card?.deck}_${card?.card?.filename}.jpg")`,
+                backgroundImage: `url("/sm/${card?.card?.deck}_${card?.card?.filename}.jpg")`,
             }}
         >
             <div
                 className="card-border"
                 style={{
-                    backgroundImage: `url("./icons/border_gold.png")`,
+                    backgroundImage: `url("/icons/border_gold.png")`,
                 }}
             ></div>
 
@@ -20,7 +20,7 @@ const CardPlayedComponent = (card) => {
                 <div
                     className="card-power-box"
                     style={{
-                        backgroundImage: `url("./icons/power_normal_icon.png")`,
+                        backgroundImage: `url("/icons/power_normal_icon.png")`,
                     }}
                 >
                     <div className="card-power">{card?.card?.strength}</div>
@@ -32,7 +32,7 @@ const CardPlayedComponent = (card) => {
                 <div
                     className="card-power-hero-box"
                     style={{
-                        backgroundImage: `url("./icons/power_hero.png")`,
+                        backgroundImage: `url("/icons/power_hero.png")`,
                     }}
                 >
                     <div className="card-power-hero">
@@ -46,7 +46,7 @@ const CardPlayedComponent = (card) => {
                 <div
                     className="card-row-box"
                     style={{
-                        backgroundImage: `url("./icons/card_row_${card?.card?.row}.png")`,
+                        backgroundImage: `url("/icons/card_row_${card?.card?.row}.png")`,
                     }}
                 ></div>
             )}
@@ -56,7 +56,7 @@ const CardPlayedComponent = (card) => {
                 <div
                     className="card-ability-box"
                     style={{
-                        backgroundImage: `url("./icons/card_ability_${card?.card?.ability}.png")`,
+                        backgroundImage: `url("/icons/card_ability_${card?.card?.ability}.png")`,
                     }}
                 ></div>
             )}

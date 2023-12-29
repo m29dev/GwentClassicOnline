@@ -13,7 +13,7 @@ html {
     margin: 0px !important;
     padding: 0px !important;
 
-    cursor: url('./icons/cursor.png'), auto;
+    cursor: url('/icons/cursor.png'), auto;
 }
 
 ::-webkit-scrollbar {
@@ -22,12 +22,12 @@ html {
 
 @font-face {
     font-family: 'GWENT';
-    src: url('./fonts/GWENT-ExtraBold.eot');
-    src: url('./fonts/GWENT-ExtraBold.eot?#iefix') format('embedded-opentype'),
-        url('./fonts/GWENT-ExtraBold.woff2') format('woff2'),
-        url('./fonts/GWENT-ExtraBold.woff') format('woff'),
-        url('./fonts/GWENT-ExtraBold.ttf') format('truetype'),
-        url('./fonts/GWENT-ExtraBold.svg#GWENT-ExtraBold') format('svg');
+    src: url('/fonts/GWENT-ExtraBold.eot');
+    src: url('/fonts/GWENT-ExtraBold.eot?#iefix') format('embedded-opentype'),
+        url('/fonts/GWENT-ExtraBold.svg#GWENT-ExtraBold') format('svg'),
+        url('/fonts/GWENT-ExtraBold.woff2') format('woff2'),
+        url('/fonts/GWENT-ExtraBold.woff') format('woff'),
+        url('/fonts/GWENT-ExtraBold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
     font-display: swap;

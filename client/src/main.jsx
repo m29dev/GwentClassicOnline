@@ -76,7 +76,7 @@ import { store } from './redux/store'
 import { Provider } from 'react-redux'
 import HomePage from './pages/PrivatePages/HomePage'
 import AuthPage from './pages/PublicPages/AuthPage'
-import GamePage from './pages/PrivatePages/GamePage'
+// import GamePage from './pages/PrivatePages/GamePage'
 import RoomsPage from './pages/PrivatePages/RoomsPage'
 import RoomsIdPage from './pages/PrivatePages/RoomsIdPage'
 
@@ -91,7 +91,7 @@ const router = createBrowserRouter(
             <Route path="/home" element={<HomePage />} />
             <Route path="/rooms" element={<RoomsPage />} />
             <Route path="/rooms/:id" element={<RoomsIdPage />} />
-            <Route path="/game" element={<GamePage />} />
+            {/* <Route path="/game" element={<GamePage />} /> */}
         </Route>
     )
 )

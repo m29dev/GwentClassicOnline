@@ -2,32 +2,14 @@ import { useCallback, useEffect } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
 import { useRoomReadMutation } from '../../services/roomService'
 import { useSelector, useDispatch } from 'react-redux'
-import { useGameInitMutation } from '../../services/gameService'
 import { setGameInfo, setRoomInfo } from '../../redux/authSlice'
+import GameComponent from '../../components/game/GameComponent'
 
 const RoomsIdPage = () => {
     const { userInfo, roomInfo, gameInfo } = useSelector((state) => state.auth)
     const [socket] = useOutletContext()
     const params = useParams()
     const dispatch = useDispatch()
-
-    // CHOOSE FACTION INIT GAME INFO UPDATE
-    const [gameInit] = useGameInitMutation()
-    const handleChooseFaction = async () => {
-        try {
-            const res = await gameInit({
-                // playerId: userInfo?.id,
-                playerNickname: userInfo?.nickname,
-                gameId: roomInfo?.roomGameId,
-                faction: 'realms',
-            }).unwrap()
-            console.log(res)
-
-            dispatch(setGameInfo(res))
-        } catch (err) {
-            console.log(err)
-        }
-    }
 
     // ON INIT CONFIG
     const id = params.id
@@ -61,11 +43,11 @@ const RoomsIdPage = () => {
         joinRoom()
     }, [joinRoom])
 
-    const gameInitFaction = async () => {
+    const gameInitFaction = async (faction) => {
         socket.emit('gameInitFaction', {
             room_id: id,
             game_id: roomInfo?.roomGameId,
-            faction: 'realms',
+            faction,
         })
     }
 
@@ -103,11 +85,22 @@ const RoomsIdPage = () => {
             {!gameInfo?.gameActive && (
                 <>
                     <h1>Choose Faction</h1>
-                    <button onClick={gameInitFaction}>Northern Realms</button>
+                    <button onClick={() => gameInitFaction('realms')}>
+                        Northern Realms
+                    </button>
+                    <button onClick={() => gameInitFaction('scoiatael')}>
+                        Scoiatael
+                    </button>
+                    <button onClick={() => gameInitFaction('monsters')}>
+                        Monsters
+                    </button>
+                    <button onClick={() => gameInitFaction('nilfgaard')}>
+                        Nilfgaard
+                    </button>
                 </>
             )}
 
-            {gameInfo?.gameActive && <h1>init game</h1>}
+            {gameInfo?.gameActive && <GameComponent></GameComponent>}
         </>
     )
 }

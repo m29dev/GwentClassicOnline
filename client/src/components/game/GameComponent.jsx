@@ -1,73 +1,51 @@
-import { useCallback, useEffect } from 'react'
-import CardComponent from '../../components/card/cardCurrentPlayer/CardComponent'
-import './PrivatePages.css'
-import { useGameReadIdMutation } from '../../services/gameService'
-import { useDispatch, useSelector } from 'react-redux'
+import CardComponent from '../card/cardCurrentPlayer/CardComponent'
+import CardDetailsComponent from '../card/cardCurrentPlayer/CardDetailsComponent'
+import { useSelector } from 'react-redux'
+import CardPlayedComponent from '../card/cardCurrentPlayer/CardPlayedComponent'
+import '../../pages/PrivatePages/PrivatePages.css'
 import { setGameInfo } from '../../redux/authSlice'
-import CardPlayedComponent from '../../components/card/cardCurrentPlayer/CardPlayedComponent'
-import CardDetailsComponent from '../../components/card/cardCurrentPlayer/CardDetailsComponent'
+import { useDispatch } from 'react-redux'
 
-const GamePage = () => {
-    const { gameInfo, userInfo } = useSelector((state) => state.auth)
-
-    // const [deck, setDeck] = useState([])
+const GameComponent = () => {
+    const { userInfo, gameInfo } = useSelector((state) => state.auth)
     const dispatch = useDispatch()
 
     // config
     const handlePlayCard = (_row) => {
         // objects to edit / update
-        const gameInfoPlayer0 = structuredClone(gameInfo?.player_current)
-        const gameInfoPlayer1 = gameInfo?.player_opp
-        const cardSelected = gameInfo?.player_current?.player_card_selected
+        const gameInfoEdit = structuredClone(gameInfo?.gamePlayerCurrent)
+        const gameInfoAll = structuredClone(gameInfo)
+        const cardSelected = gameInfo?.gamePlayerCurrent?.player_card_selected
 
         // check if cardSelected's row is equal to clicked row
         if (_row !== cardSelected?.row) return console.log('select right row')
+
         // check if it's current player turn
-        // add later
 
         // REMOVE PLAYED CARD FROM CURRENT CARDS
         let updatedArray = []
-        gameInfoPlayer0?.player_cards_current?.map((item) => {
+        gameInfoEdit?.player_cards_current?.map((item) => {
             if (item?.id !== cardSelected?.id) {
                 updatedArray.push(item)
             }
         })
-        gameInfoPlayer0.player_cards_current = updatedArray
+        gameInfoEdit.player_cards_current = updatedArray
 
         // ADD PLAYED CARD TO THE BOARD ARRAY
-        gameInfoPlayer0.player_cards_board.map((row) => {
+        gameInfoEdit.player_cards_board.map((row) => {
             if (row?.board_row === cardSelected?.row) {
                 row.board_row_cards.push(cardSelected)
             }
         })
 
         // REMOVE CARD SELECTED AFTER THE PLAY
-        gameInfoPlayer0.player_card_selected = {}
+        gameInfoEdit.player_card_selected = {}
 
-        const gameInfoAfterCardPlayed = {
-            player_current: gameInfoPlayer0,
-            player_opp: gameInfoPlayer1,
-        }
+        // set gameInfoEdit in the gameInfo object
+        gameInfoAll.gamePlayerCurrent = gameInfoEdit
 
-        dispatch(setGameInfo(gameInfoAfterCardPlayed))
+        dispatch(setGameInfo(gameInfoAll))
     }
-
-    const [gameRead] = useGameReadIdMutation()
-    const handleGameRead = useCallback(async () => {
-        try {
-            const res = await gameRead().unwrap()
-            console.log(res)
-
-            // setDeck(res)
-            // dispatch(setGameInfo(res))
-        } catch (err) {
-            console.log(err)
-        }
-    }, [gameRead])
-
-    useEffect(() => {
-        handleGameRead()
-    }, [handleGameRead])
 
     return (
         <div className="game-page-container">
@@ -207,4 +185,4 @@ const GamePage = () => {
     )
 }
 
-export default GamePage
+export default GameComponent
