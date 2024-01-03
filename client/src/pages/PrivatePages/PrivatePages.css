@@ -12,6 +12,7 @@
     width: 490px;
     height: 100%;
     border: #fff solid 1px;
+    position: relative;
 }
 .general-player0,
 .general-player1 {
@@ -26,6 +27,114 @@
 .general-player1 {
     margin-top: 247px;
 }
+
+.player0-info-box,
+.player1-info-box {
+    width: 450px;
+    height: 150px;
+    /* border: 1px solid greenyellow; */
+    background-color: rgba(0, 0, 0, 0.575);
+    margin-right: 20px;
+}
+
+.leftside {
+    width: 120px;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 130px;
+    /* border: 1px solid blueviolet; */
+
+    background-image: url('/icons/icon_player_border.png') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.rightside-top {
+    width: 150px;
+    height: 50%;
+    position: absolute;
+    top: 0px;
+    left: 255px;
+    /* border: 1px solid rgb(194, 129, 255); */
+}
+.rightside-bottom {
+    width: 160px;
+    height: 50%;
+    position: absolute;
+    bottom: 0px;
+    left: 255px;
+    /* border: 1px solid rgb(194, 129, 255); */
+
+    display: flex;
+    align-items: center;
+
+    font-size: 30px;
+    /*  */
+}
+.rb-cards-count-box {
+    width: 50px;
+    height: 50px;
+    background-image: url('/icons/icon_card_count.png') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.gs-box {
+    margin-left: 10px;
+    display: flex;
+}
+.p0-g0,
+.p0-g1,
+.p1-g0,
+.p1-g1 {
+    width: 50px;
+    height: 50px;
+
+    background-image: url('/icons/icon_gem_on.png') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.player-turn-active {
+    background-color: rgba(255, 217, 0, 0.274);
+    border-top: gold !important;
+    border-bottom: gold !important;
+}
+
+.player0-score-box,
+.player1-score-box {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 50px;
+    right: -32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    font-size: 35px;
+    text-align: center;
+    text-justify: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.player0-score-box {
+    background-image: url('/icons/score_total_op.png') !important;
+}
+.player1-score-box {
+    background-image: url('/icons/score_total_me.png') !important;
+}
+
+.player0-info-box {
+    position: absolute;
+    top: 250px;
+}
+
+.player1-info-box {
+    position: absolute;
+    top: 650px;
+}
+
 .weather-box {
     width: 280px;
     height: 130px;
@@ -50,10 +159,17 @@
     width: 950px;
     height: 120px;
     /* border: #fff solid 1px; */
-    margin-left: 70px;
+    margin-left: 20px;
     margin-top: 10px;
     display: flex;
     justify-content: center;
+}
+.row-points {
+    width: 46px;
+    border: 1px solid lightblue;
+    text-align: center;
+    margin: auto;
+    font-size: 30px;
 }
 .row-special-card-box {
     width: 140px;

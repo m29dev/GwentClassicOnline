@@ -55,8 +55,15 @@ io.on('connection', async (socket) => {
         // on card play
         socket.on(
             'gameCardPlay',
-            async ({ room_id, game_id, cardSelected }) => {
-                await handleGameCardPlay(socket, room_id, game_id, cardSelected)
+            async ({ room_id, game_id, cardSelected, agile, agileRow }) => {
+                await handleGameCardPlay(
+                    socket,
+                    room_id,
+                    game_id,
+                    cardSelected,
+                    agile,
+                    agileRow
+                )
             }
         )
 

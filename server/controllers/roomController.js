@@ -10,6 +10,7 @@ const room_create = async (req, res) => {
             gameInfo: [],
             gamePlayers: [],
             gameActive: false,
+            gameTurn: '',
         })
         const newGameCreated = await newGame.save()
         const gameId = newGameCreated._id

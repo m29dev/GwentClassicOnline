@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
-import { useUserConnectMutation } from '../../services/authService'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { setUserInfo } from '../../redux/authSlice'
 // import { useNavigate } from 'react-router-dom'
@@ -11,37 +10,36 @@ const AuthPage = () => {
     // const navigate = useNavigate()
     // const { userInfo } = useSelector((state) => state.auth)
 
-    const [userConnect] = useUserConnectMutation()
-    const onConnect = useCallback(
-        async (e) => {
-            try {
-                e.preventDefault()
-                if (nickname === (null || ''))
-                    return window.alert('nickname value cannot be empty')
-                const res = await userConnect(nickname).unwrap()
-                dispatch(setUserInfo(res))
-            } catch (err) {
-                console.log(err)
-            }
-        },
-        [userConnect, nickname, dispatch]
-    )
+    // const [userConnect] = useUserConnectMutation()
+    // const onConnect = useCallback(
+    //     async (e) => {
+    //         try {
+    //             e.preventDefault()
+    //             if (nickname === (null || ''))
+    //                 return window.alert('nickname value cannot be empty')
+    //             const res = await userConnect(nickname).unwrap()
+    //             dispatch(setUserInfo(res))
+    //         } catch (err) {
+    //             console.log(err)
+    //         }
+    //     },
+    //     [userConnect, nickname, dispatch]
+    // )
 
-    useEffect(() => {
-        // if (userInfo) navigate('/home')
+    const handleAuth = () => {
         dispatch(
             setUserInfo({
-                nickname: 'JJ',
+                nickname,
             })
         )
-    }, [dispatch])
+    }
 
     return (
         <>
             <div className="page-container">
                 <h1>Państwa Miasta</h1>
 
-                <form className="form-container" onSubmit={onConnect}>
+                <form className="form-container" onSubmit={handleAuth}>
                     <input
                         className="form-container-input"
                         type="text"
@@ -54,8 +52,8 @@ const AuthPage = () => {
 
                     <Button
                         variant="dark"
-                        onClick={onConnect}
                         className="form-container-btn"
+                        onClick={handleAuth}
                     >
                         Connect
                     </Button>

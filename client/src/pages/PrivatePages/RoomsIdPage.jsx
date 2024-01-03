@@ -80,6 +80,12 @@ const RoomsIdPage = () => {
     //     }
     // }, [gameInfo])
 
+    // useEffect(() => {
+    //     if (roomInfo?.roomGameId !== gameInfo?.gameId) {
+    //         dispatch(clearGameInfo())
+    //     }
+    // }, [roomInfo, gameInfo, dispatch])
+
     return (
         <>
             {!gameInfo?.gameActive && (
