@@ -116,7 +116,12 @@ const handleGameCardPlay = async (
 
         // check which player has theirs turn, and set new turn to the other player
         if (item.player_name !== game.gameTurn) {
-            calcGameTurn = item.player_name
+            // check if item.player has at least 1 card
+            if (item.player_cards_current.length >= 1) {
+                calcGameTurn = item.player_name
+            } else {
+                calcGameTurn = game.gameTurn
+            }
         }
     })
 
@@ -147,6 +152,11 @@ const handleGameCardPlay = async (
 
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
+
+    // CHECK IF ALL CARD BEEN PLAYED
+    if (gameInfoEdit.player_cards_current.length === 0) {
+        gameInfoEdit.player_round_active = false
+    }
 
     const updateGame = await Game.findByIdAndUpdate(
         { _id: game_id },
