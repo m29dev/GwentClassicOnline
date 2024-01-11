@@ -12,6 +12,7 @@ const {
     handleGameStart,
     handleGameInitFaction,
     handleGameCardPlay,
+    handleGamePassRound,
 } = require('./config/socketGameConfig')
 
 dotenv.config()
@@ -66,6 +67,11 @@ io.on('connection', async (socket) => {
                 )
             }
         )
+
+        // on start the game
+        socket.on('gamePassRound', async ({ room_id, game_id }) => {
+            await handleGamePassRound(socket, room_id, game_id)
+        })
 
         // on start the game
         socket.on('gameStart', async ({ room_id }) => {

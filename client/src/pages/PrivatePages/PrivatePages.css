@@ -100,6 +100,12 @@
     border-bottom: gold !important;
 }
 
+.pass-btn {
+    position: absolute;
+    top: 880px;
+    left: 350px;
+}
+
 .player0-score-box,
 .player1-score-box {
     width: 60px;

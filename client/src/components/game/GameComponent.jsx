@@ -1,34 +1,25 @@
 import CardComponent from '../card/cardCurrentPlayer/CardComponent'
 import CardDetailsComponent from '../card/cardCurrentPlayer/CardDetailsComponent'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import CardPlayedComponent from '../card/cardCurrentPlayer/CardPlayedComponent'
 import '../../pages/PrivatePages/PrivatePages.css'
 // import { setGameInfo } from '../../redux/authSlice'
 
 import { useOutletContext } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import Popup from '../popup/Popup'
+import { useGameReadIdMutation } from '../../services/gameService'
+import { setGameInfo } from '../../redux/authSlice'
 
 const GameComponent = () => {
     const { userInfo, gameInfo, roomInfo } = useSelector((state) => state.auth)
     const [socket] = useOutletContext()
-
-    const [rowClosePoints, setRowClosePoints] = useState(null)
-    const [rowRangedPoints, setRowRangedPoints] = useState(null)
-    const [rowSiegePoints, setRowSiegePoints] = useState(null)
-
-    const [rowClosePointsOpp, setRowClosePointsOpp] = useState(null)
-    const [rowRangedPointsOpp, setRowRangedPointsOpp] = useState(null)
-    const [rowSiegePointsOpp, setRowSiegePointsOpp] = useState(null)
+    const dispatch = useDispatch()
 
     // const dispatch = useDispatch()
 
     // config
     const handlePlayCard = (_row) => {
-        // objects to edit / update
-        // const gameInfoEdit = structuredClone(gameInfo?.gamePlayerCurrent)
-        // const gameInfoAll = structuredClone(gameInfo)
-
         const cardSelected = structuredClone(
             gameInfo?.gamePlayerCurrent?.player_card_selected
         )
@@ -39,8 +30,14 @@ const GameComponent = () => {
         }
 
         // check if cardSelected's row is equal to clicked row
-        if (cardSelected?.row !== 'agile' && _row !== cardSelected?.row)
+        if (cardSelected?.row !== 'agile' && _row !== cardSelected?.row) {
             return console.log('select right row')
+        }
+
+        // check if cardSelected's row is agile and row is not siege
+        if (cardSelected?.row === 'agile' && _row === 'siege') {
+            return console.log('select right row')
+        }
 
         // if card is agile
         let isAgile = false
@@ -56,82 +53,31 @@ const GameComponent = () => {
             agile: isAgile,
             agileRow: _row,
         })
-
-        // // REMOVE PLAYED CARD FROM CURRENT CARDS
-        // let updatedArray = []
-        // gameInfoEdit?.player_cards_current?.map((item) => {
-        //     if (item?.id !== cardSelected?.id) {
-        //         updatedArray.push(item)
-        //     }
-        // })
-        // gameInfoEdit.player_cards_current = updatedArray
-
-        // // ADD PLAYED CARD TO THE BOARD ARRAY
-        // gameInfoEdit.player_cards_board.map((row) => {
-        //     if (row?.board_row === cardSelected?.row) {
-        //         row.board_row_cards.push(cardSelected)
-        //     }
-        // })
-
-        // // REMOVE CARD SELECTED AFTER THE PLAY
-        // gameInfoEdit.player_card_selected = {}
-
-        // // set gameInfoEdit in the gameInfo object
-        // gameInfoAll.gamePlayerCurrent = gameInfoEdit
-
-        // dispatch(setGameInfo(gameInfoAll))
     }
 
+    const handlePassRound = () => {
+        socket.emit('gamePassRound', {
+            room_id: roomInfo?._id,
+            game_id: roomInfo?.roomGameId,
+        })
+    }
+
+    const [getGameId] = useGameReadIdMutation()
+    const handleFetchGameInfoData = useCallback(async () => {
+        const res = await getGameId({
+            game_id: roomInfo?.roomGameId,
+            userId: userInfo?.nickname,
+        }).unwrap()
+
+        dispatch(setGameInfo(res))
+
+        console.log('FETCHING GAME DATA ON INIT...', res)
+    }, [getGameId, roomInfo, userInfo, dispatch])
+
+    // on init fetch gameInfo data from database
     useEffect(() => {
-        // close row points
-        let rowClosePointsCalc = 0
-        gameInfo?.gamePlayerCurrent?.player_cards_board?.[0]?.board_row_cards?.map(
-            (item) => {
-                rowClosePointsCalc = +rowClosePointsCalc + +item.strength
-            }
-        )
-        setRowClosePoints(rowClosePointsCalc)
-        let rowClosePointsCalcOpp = 0
-        gameInfo?.gamePlayerOpponent?.player_cards_board?.[0]?.board_row_cards?.map(
-            (item) => {
-                rowClosePointsCalcOpp = +rowClosePointsCalcOpp + +item.strength
-            }
-        )
-        setRowClosePointsOpp(rowClosePointsCalcOpp)
-
-        // ranged row points
-        let rowRangedPointsCalc = 0
-        gameInfo?.gamePlayerCurrent?.player_cards_board?.[1]?.board_row_cards?.map(
-            (item) => {
-                rowRangedPointsCalc = +rowRangedPointsCalc + +item.strength
-            }
-        )
-        setRowRangedPoints(rowRangedPointsCalc)
-        let rowRangedPointsCalcOpp = 0
-        gameInfo?.gamePlayerOpponent?.player_cards_board?.[1]?.board_row_cards?.map(
-            (item) => {
-                rowRangedPointsCalcOpp =
-                    +rowRangedPointsCalcOpp + +item.strength
-            }
-        )
-        setRowRangedPointsOpp(rowRangedPointsCalcOpp)
-
-        // siege row points
-        let rowSiegePointsCalc = 0
-        gameInfo?.gamePlayerCurrent?.player_cards_board?.[2]?.board_row_cards?.map(
-            (item) => {
-                rowSiegePointsCalc = +rowSiegePointsCalc + +item.strength
-            }
-        )
-        setRowSiegePoints(rowSiegePointsCalc)
-        let rowSiegePointsCalcOpp = 0
-        gameInfo?.gamePlayerOpponent?.player_cards_board?.[2]?.board_row_cards?.map(
-            (item) => {
-                rowSiegePointsCalcOpp = +rowSiegePointsCalcOpp + +item.strength
-            }
-        )
-        setRowSiegePointsOpp(rowSiegePointsCalcOpp)
-    }, [gameInfo])
+        handleFetchGameInfoData()
+    }, [handleFetchGameInfoData])
 
     return (
         <div className="game-page-container">
@@ -183,9 +129,10 @@ const GameComponent = () => {
                     </div>
 
                     {/* player game score */}
-                    <div className="player0-score-box">0</div>
+                    <div className="player0-score-box">
+                        {gameInfo?.gamePlayerOpponent?.player_points}
+                    </div>
                 </div>
-
                 <div className="weather-box"></div>
 
                 {/* PLAYER CURR INFO */}
@@ -225,9 +172,10 @@ const GameComponent = () => {
                     </div>
 
                     {/* player game score */}
-                    <div className="player1-score-box">0</div>
+                    <div className="player1-score-box">
+                        {gameInfo?.gamePlayerCurrent?.player_points}
+                    </div>
                 </div>
-
                 <div className="general-player1">
                     {gameInfo?.gamePlayerCurrent?.player_name ===
                         userInfo?.nickname && (
@@ -235,6 +183,20 @@ const GameComponent = () => {
                             card={gameInfo?.gamePlayerCurrent?.player_leader}
                         ></CardComponent>
                     )}
+                </div>
+
+                {/* PASS BUTTON */}
+                <div className="pass-btn">
+                    <button
+                        onClick={handlePassRound}
+                        disabled={
+                            gameInfo?.gameTurn === userInfo?.nickname
+                                ? false
+                                : true
+                        }
+                    >
+                        PASS
+                    </button>
                 </div>
             </div>
 
@@ -244,7 +206,12 @@ const GameComponent = () => {
                 <div className="row-box-player0">
                     {/* ROW SIEGE */}
                     <div className="row">
-                        <div className="row-points">{rowSiegePointsOpp}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerOpponent
+                                    ?.player_cards_board?.[2]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={
@@ -270,7 +237,12 @@ const GameComponent = () => {
 
                     {/* ROW RANGED */}
                     <div className="row">
-                        <div className="row-points">{rowRangedPointsOpp}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerOpponent
+                                    ?.player_cards_board?.[1]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={
@@ -296,7 +268,12 @@ const GameComponent = () => {
 
                     {/* ROW CLOSE */}
                     <div className="row">
-                        <div className="row-points">{rowClosePointsOpp}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerOpponent
+                                    ?.player_cards_board?.[0]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={
@@ -325,7 +302,12 @@ const GameComponent = () => {
                 <div className="row-box-player1">
                     {/* ROW CLOSE */}
                     <div className="row">
-                        <div className="row-points">{rowClosePoints}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_cards_board?.[0]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={
@@ -352,7 +334,12 @@ const GameComponent = () => {
 
                     {/* ROW RANGE */}
                     <div className="row">
-                        <div className="row-points">{rowRangedPoints}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_cards_board?.[1]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={
@@ -379,7 +366,12 @@ const GameComponent = () => {
 
                     {/* ROW SIEGE */}
                     <div className="row">
-                        <div className="row-points">{rowSiegePoints}</div>
+                        <div className="row-points">
+                            {
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_cards_board?.[2]?.board_row_points
+                            }
+                        </div>
                         <div className="row-special-card-box"></div>
                         <div
                             className={

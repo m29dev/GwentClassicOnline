@@ -15,8 +15,8 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
         // READ GAME BY ID
         gameReadId: builder.mutation({
-            query: () => ({
-                url: `${GAME_URL}/read/${'id'}`,
+            query: (data) => ({
+                url: `${GAME_URL}/${data?.game_id}/${data?.userId}`,
                 method: 'GET',
             }),
         }),

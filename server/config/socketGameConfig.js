@@ -36,6 +36,7 @@ const handleGameInitFaction = async (socket, room_id, game_id, faction) => {
         player_card_selected: {},
         player_cards_current: deck?.starterCards, // all cards YET to play
         player_cards_played: [], // add each played card here
+        player_round_active: true,
 
         // variable info, clear each round
         player_cards_board: [
@@ -105,7 +106,8 @@ const handleGameCardPlay = async (
     const game = await Game.findById({ _id: game_id })
     let gameInfoEdit
     let gameInfoEditOpp
-    let calcGameTurn
+    let calcGameTurn = game.gameTurn
+
     game.gameInfo.forEach((item) => {
         // check which player is current
         if (item.player_name === socket.userId) {
@@ -114,16 +116,25 @@ const handleGameCardPlay = async (
             gameInfoEditOpp = item
         }
 
-        // check which player has theirs turn, and set new turn to the other player
-        if (item.player_name !== game.gameTurn) {
-            // check if item.player has at least 1 card
-            if (item.player_cards_current.length >= 1) {
-                calcGameTurn = item.player_name
-            } else {
-                calcGameTurn = game.gameTurn
-            }
-        }
+        // check which player has the turn, and set new turn to the other player
+        // if (
+        //     item.player_name !== game.gameTurn &&
+        //     gameInfoEditOpp.player_round_active
+        // ) {
+        //     // check if item.player has at least 1 card
+        //     if (item.player_cards_current.length >= 1) {
+        //         calcGameTurn = item.player_name
+        //     }
+        // }
     })
+
+    // CHANGE PLAYERS TURN
+    if (
+        gameInfoEditOpp.player_round_active &&
+        gameInfoEditOpp.player_cards_current.length >= 1
+    ) {
+        calcGameTurn = gameInfoEditOpp.player_name
+    }
 
     // REMOVE PLAYED CARD FROM CURRENT CARDS
     let updatedArray = []
@@ -138,6 +149,11 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_board.map((row) => {
             if (row?.board_row === cardSelected?.row) {
                 row.board_row_cards.push(cardSelected)
+
+                // add row strength points
+                row.board_row_points = row.board_row_points
+                    ? +row.board_row_points + +cardSelected?.strength
+                    : +cardSelected?.strength
             }
         })
     }
@@ -146,9 +162,19 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_board.map((row) => {
             if (row?.board_row === agileRow) {
                 row.board_row_cards.push(cardSelected)
+
+                // add row strength points
+                row.board_row_points = row.board_row_points
+                    ? +row.board_row_points + +cardSelected?.strength
+                    : +cardSelected?.strength
             }
         })
     }
+
+    // add general strength points
+    gameInfoEdit.player_points = gameInfoEdit.player_points
+        ? +gameInfoEdit.player_points + +cardSelected?.strength
+        : +cardSelected?.strength
 
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
@@ -158,15 +184,44 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_round_active = false
     }
 
+    // CHECK IF BOTH PLAYERS ENDED CURRENT ROUND
+    let gameActiveUpdate = true
+    let gameRoundWinner
+    if (
+        !gameInfoEdit.player_round_active &&
+        !gameInfoEditOpp.player_round_active
+    ) {
+        // end round
+        gameActiveUpdate = false
+
+        // IF ROUND ENDS, CHECK THE WINNER
+        let gameWinner = null
+        if (!gameActiveUpdate) {
+            if (gameInfoEdit.player_points > gameInfoEditOpp.player_points) {
+                gameWinner = gameInfoEdit.player_name
+            } else {
+                gameWinner = gameInfoEditOpp.player_name
+            }
+        }
+
+        console.log(
+            `GAME ENDS. SCORE: ${gameInfoEdit.player_points}:${gameInfoEditOpp.player_points}. WINNER IS: ${gameWinner}`
+        )
+    }
+
     const updateGame = await Game.findByIdAndUpdate(
         { _id: game_id },
-        { gameInfo: [gameInfoEdit, gameInfoEditOpp], gameTurn: calcGameTurn }
+        {
+            gameInfo: [gameInfoEdit, gameInfoEditOpp],
+            gameTurn: calcGameTurn,
+            gameActive: gameActiveUpdate,
+        }
     )
 
     // SEND DATA TO OPP PLAYER
     const gameInfoOpp = {
         gameId: game_id,
-        gameActive: true,
+        gameActive: gameActiveUpdate,
         gameRound: game.gameRound,
         gameTurn: calcGameTurn,
         gamePlayerCurrent: gameInfoEditOpp,
@@ -177,9 +232,67 @@ const handleGameCardPlay = async (
     // SEND DATA TO CURR PLAYER socket.user_id
     const gameInfoCurr = {
         gameId: game_id,
-        gameActive: true,
+        gameActive: gameActiveUpdate,
         gameRound: game.gameRound,
         gameTurn: calcGameTurn,
+        gamePlayerCurrent: gameInfoEdit,
+        gamePlayerOpponent: gameInfoEditOpp,
+    }
+    socket.nsp.to(socket.id).emit('gameInfoData', gameInfoCurr)
+}
+
+const handleGamePassRound = async (socket, room_id, game_id) => {
+    const game = await Game.findById({ _id: game_id })
+    let gameInfoEdit
+    let gameInfoEditOpp
+
+    game.gameInfo.forEach((item) => {
+        if (item.player_name === socket.userId) {
+            gameInfoEdit = item
+        } else {
+            gameInfoEditOpp = item
+        }
+    })
+
+    if (!gameInfoEdit || !gameInfoEditOpp) return console.log('err')
+
+    gameInfoEdit.player_round_active = false
+    game.gameTurn = gameInfoEditOpp.player_name
+
+    // CHECK IF BOTH PLAYERS ENDED ROUND
+    if (
+        !gameInfoEdit.player_round_active &&
+        !gameInfoEditOpp.player_round_active
+    ) {
+        game.gameActive = false
+    }
+
+    await Game.findByIdAndUpdate(
+        { _id: game_id },
+        {
+            gameInfo: [gameInfoEdit, gameInfoEditOpp],
+            gameTurn: game.gameTurn,
+            gameActive: game.gameActive,
+        }
+    )
+
+    // SEND DATA TO OPP PLAYER
+    const gameInfoOpp = {
+        gameId: game_id,
+        gameActive: game.gameActive,
+        gameRound: game.gameRound,
+        gameTurn: game.gameTurn,
+        gamePlayerCurrent: gameInfoEditOpp,
+        gamePlayerOpponent: gameInfoEdit,
+    }
+    socket.to(room_id).emit('gameInfoData', gameInfoOpp)
+
+    // SEND DATA TO CURR PLAYER socket.user_id
+    const gameInfoCurr = {
+        gameId: game_id,
+        gameActive: game.gameActive,
+        gameRound: game.gameRound,
+        gameTurn: game.gameTurn,
         gamePlayerCurrent: gameInfoEdit,
         gamePlayerOpponent: gameInfoEditOpp,
     }
@@ -190,4 +303,5 @@ module.exports = {
     handleGameInitFaction,
     handleGameStart,
     handleGameCardPlay,
+    handleGamePassRound,
 }

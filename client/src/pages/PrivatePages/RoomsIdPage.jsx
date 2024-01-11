@@ -4,6 +4,7 @@ import { useRoomReadMutation } from '../../services/roomService'
 import { useSelector, useDispatch } from 'react-redux'
 import { setGameInfo, setRoomInfo } from '../../redux/authSlice'
 import GameComponent from '../../components/game/GameComponent'
+import GameAfterComponent from '../../components/game/GameAfterComponent'
 
 const RoomsIdPage = () => {
     const { userInfo, roomInfo, gameInfo } = useSelector((state) => state.auth)
@@ -103,6 +104,8 @@ const RoomsIdPage = () => {
                     <button onClick={() => gameInitFaction('nilfgaard')}>
                         Nilfgaard
                     </button>
+
+                    <GameAfterComponent></GameAfterComponent>
                 </>
             )}
 
