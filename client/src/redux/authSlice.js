@@ -12,6 +12,10 @@ const initialState = {
     gameInfo: localStorage.getItem('gameInfo')
         ? JSON.parse(localStorage.getItem('gameInfo'))
         : null,
+
+    menuInfo: localStorage.getItem('menuInfo')
+        ? JSON.parse(localStorage.getItem('menuInfo'))
+        : null,
 }
 
 export const authSlice = createSlice({
@@ -47,6 +51,16 @@ export const authSlice = createSlice({
             state.gameInfo = null
             localStorage.removeItem('gameInfo')
         },
+
+        // menu information
+        setMenuInfo: (state, action) => {
+            state.menuInfo = action.payload
+            localStorage.setItem('menuInfo', JSON.stringify(action.payload))
+        },
+        clearMenuInfo: (state) => {
+            state.menuInfo = null
+            localStorage.removeItem('menuInfo')
+        },
     },
 })
 
@@ -57,5 +71,7 @@ export const {
     clearRoomInfo,
     setGameInfo,
     clearGameInfo,
+    setMenuInfo,
+    clearMenuInfo,
 } = authSlice.actions
 export default authSlice.reducer

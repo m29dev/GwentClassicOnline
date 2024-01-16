@@ -175,7 +175,43 @@ const game_read_id = async (req, res) => {
     }
 }
 
+const game_factions = async (req, res) => {
+    try {
+        console.log('reached factions')
+        const factions = ['realms', 'nilfgaard', 'monsters', 'scoiatael']
+        const factionsInfo = {
+            factionId: 0,
+            factions: [],
+        }
+
+        factions.forEach((faction) => {
+            let factionObject = {
+                faction: faction,
+                cardsCollection: [],
+                cardsDeck: [],
+                leadersCollection: [],
+                leaderDeck: {},
+            }
+
+            cards.forEach((item) => {
+                if (item.deck === faction) {
+                    item.row !== 'leader'
+                        ? factionObject.cardsCollection.push(item)
+                        : factionObject.leadersCollection.push(item)
+                }
+            })
+
+            factionsInfo.factions.push(factionObject)
+        })
+
+        res.json(factionsInfo)
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 module.exports = {
     game_init,
     game_read_id,
+    game_factions,
 }

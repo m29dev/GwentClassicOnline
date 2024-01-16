@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setGameInfo, setRoomInfo } from '../../redux/authSlice'
 import GameComponent from '../../components/game/GameComponent'
 import GameAfterComponent from '../../components/game/GameAfterComponent'
+import GameMenuComponent from '../../components/game/GameMenuComponent'
+import GameFactionComponent from '../../components/game/GameFactionComponent'
 
 const RoomsIdPage = () => {
     const { userInfo, roomInfo, gameInfo } = useSelector((state) => state.auth)
@@ -89,7 +91,7 @@ const RoomsIdPage = () => {
 
     return (
         <>
-            {!gameInfo?.gameActive && (
+            {/* {!gameInfo?.gameActive && (
                 <>
                     <h1>Choose Faction</h1>
                     <button onClick={() => gameInitFaction('realms')}>
@@ -107,6 +109,12 @@ const RoomsIdPage = () => {
 
                     <GameAfterComponent></GameAfterComponent>
                 </>
+            )} */}
+
+            {/* {!gameInfo?.gameActive && <GameMenuComponent></GameMenuComponent>} */}
+
+            {!gameInfo?.gameActive && (
+                <GameFactionComponent></GameFactionComponent>
             )}
 
             {gameInfo?.gameActive && <GameComponent></GameComponent>}

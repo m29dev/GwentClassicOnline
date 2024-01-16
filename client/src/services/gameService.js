@@ -28,6 +28,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
             }),
         }),
+
+        // FETCH FACTIONS
+        gameFactions: builder.mutation({
+            query: () => ({
+                url: `${GAME_URL}/factions`,
+                method: 'GET',
+            }),
+        }),
     }),
 })
 
@@ -35,4 +43,5 @@ export const {
     useGameInitMutation,
     useGameReadIdMutation,
     useGamePlayCardMutation,
+    useGameFactionsMutation,
 } = authApiSlice

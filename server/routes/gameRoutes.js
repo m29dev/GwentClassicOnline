@@ -8,6 +8,9 @@ router.post('/api/game/init', controller.game_init)
 // // READ GAME
 router.get('/api/game/:game_id/:userId', controller.game_read_id)
 
+// FETCH FACTIONS
+router.get('/api/game/factions', controller.game_factions)
+
 // // UPDADTE GAME
 // router.post('/api/game/update/:id', controller.game_update_id)
 
