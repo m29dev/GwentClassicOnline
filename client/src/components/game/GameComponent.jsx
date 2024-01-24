@@ -39,6 +39,10 @@ const GameComponent = () => {
             return console.log('select right row')
         }
 
+        if (cardSelected?.ability === 'spy') {
+            console.log('CARD IS A SPY')
+        }
+
         // if card is agile
         let isAgile = false
         if (cardSelected?.row === 'agile') {
@@ -215,8 +219,10 @@ const GameComponent = () => {
                         <div className="row-special-card-box"></div>
                         <div
                             className={
-                                gameInfo?.gamePlayerOpponent
-                                    ?.player_card_selected?.row === 'siege'
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'siege' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -246,8 +252,10 @@ const GameComponent = () => {
                         <div className="row-special-card-box"></div>
                         <div
                             className={
-                                gameInfo?.gamePlayerOpponent
-                                    ?.player_card_selected?.row === 'ranged'
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'ranged' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -277,8 +285,10 @@ const GameComponent = () => {
                         <div className="row-special-card-box"></div>
                         <div
                             className={
-                                gameInfo?.gamePlayerOpponent
-                                    ?.player_card_selected?.row === 'close'
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'close' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -313,7 +323,9 @@ const GameComponent = () => {
                             className={
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row ===
-                                ('close' || 'agile')
+                                    ('close' || 'agile') &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !== 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -345,7 +357,9 @@ const GameComponent = () => {
                             className={
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row ===
-                                ('ranged' || 'agile')
+                                    ('ranged' || 'agile') &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !== 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -376,7 +390,9 @@ const GameComponent = () => {
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.row === 'siege'
+                                    ?.player_card_selected?.row === 'siege' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !== 'spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }

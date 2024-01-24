@@ -1,14 +1,28 @@
 const { getFaction } = require('./factionConfig')
 const Game = require('../models/Game')
 
-const handleGameInitFaction = async (socket, room_id, game_id, faction) => {
+const handleGameInitFaction = async (
+    socket,
+    room_id,
+    game_id,
+    faction,
+    cardsDeck,
+    leaderDeck
+) => {
     console.log('game init')
 
-    // const { gameId, faction, playerId, playerNickname } = req.body
-    const deck = await getFaction(faction)
-    const game = await Game.findById({ _id: game_id })
+    // RANDOMIZE INIT 10 STARTER CARDS
+    const currentDeck = []
+    const cardsDeckNotPlayed = []
+    cardsDeck.forEach((item, index) => {
+        if (index < 10) {
+            currentDeck.push(item)
+        } else {
+            cardsDeckNotPlayed.push(item)
+        }
+    })
 
-    // console.log('game: ', game)
+    const game = await Game.findById({ _id: game_id })
 
     // check if gameInfo has already 2 players info
     if (game?.gameInfo?.length >= 2)
@@ -29,12 +43,15 @@ const handleGameInitFaction = async (socket, room_id, game_id, faction) => {
         // player_id: 0, ADD LATER AN ID WITH NICKNAME
         player_name: socket?.userId,
         player_deck: faction, // deck name: Northern Realms
-        player_deck_cards_all: deck?.selectedDeck, // deck cards, all of selected cards by player
-        player_leader: deck?.selectedLeader, // deck leader selected by player
+        // player_deck_cards_all: deck?.selectedDeck, // deck cards, all of selected cards by player
+        player_deck_cards_all: cardsDeck, // deck cards, all of selected cards by player
+        player_cards_not_played: cardsDeckNotPlayed,
+        // player_leader: deck?.selectedLeader, // deck leader selected by player
+        player_leader: leaderDeck, // deck leader selected by player
 
         // variable info, update each play / each round
         player_card_selected: {},
-        player_cards_current: deck?.starterCards, // all cards YET to play
+        player_cards_current: currentDeck, // all cards YET to play
         player_cards_played: [], // add each played card here
         player_round_active: true,
 
@@ -144,9 +161,54 @@ const handleGameCardPlay = async (
         }
     })
     gameInfoEdit.player_cards_current = updatedArray
+
+    // CHECK IF CARD IS A SPY
+    isSpy = false
+    if (cardSelected?.ability === 'spy') {
+        isSpy = true
+    }
+
     // ADD PLAYED CARD TO THE BOARD ARRAY
-    if (!agile) {
-        gameInfoEdit.player_cards_board.map((row) => {
+    // NOT A SPY
+    if (!isSpy) {
+        if (!agile) {
+            gameInfoEdit.player_cards_board.map((row) => {
+                if (row?.board_row === cardSelected?.row) {
+                    row.board_row_cards.push(cardSelected)
+
+                    // add row strength points
+                    row.board_row_points = row.board_row_points
+                        ? +row.board_row_points + +cardSelected?.strength
+                        : +cardSelected?.strength
+                }
+            })
+        }
+
+        if (agile) {
+            gameInfoEdit.player_cards_board.map((row) => {
+                if (row?.board_row === agileRow) {
+                    row.board_row_cards.push(cardSelected)
+
+                    // add row strength points
+                    row.board_row_points = row.board_row_points
+                        ? +row.board_row_points + +cardSelected?.strength
+                        : +cardSelected?.strength
+                }
+            })
+        }
+
+        gameInfoEdit.player_cards_played.push(cardSelected)
+
+        // add general strength points
+        gameInfoEdit.player_points = gameInfoEdit.player_points
+            ? +gameInfoEdit.player_points + +cardSelected?.strength
+            : +cardSelected?.strength
+    }
+
+    // ADD PLAYED CARD TO THE BOARD ARRAY
+    // A SPY
+    if (isSpy) {
+        gameInfoEditOpp.player_cards_board.map((row) => {
             if (row?.board_row === cardSelected?.row) {
                 row.board_row_cards.push(cardSelected)
 
@@ -156,25 +218,26 @@ const handleGameCardPlay = async (
                     : +cardSelected?.strength
             }
         })
-    }
 
-    if (agile) {
-        gameInfoEdit.player_cards_board.map((row) => {
-            if (row?.board_row === agileRow) {
-                row.board_row_cards.push(cardSelected)
+        gameInfoEditOpp.player_cards_played.push(cardSelected)
 
-                // add row strength points
-                row.board_row_points = row.board_row_points
-                    ? +row.board_row_points + +cardSelected?.strength
-                    : +cardSelected?.strength
+        // ADD 2 RANDOM CARDS FROM ARRAY OF THE YET TO PLAY CARDS
+        const updateCardsNotPlayed = []
+        gameInfoEdit.player_cards_not_played.forEach((item, index) => {
+            if (index < 2) {
+                gameInfoEdit.player_cards_current.push(item)
+            } else {
+                updateCardsNotPlayed.push(item)
             }
         })
-    }
+        // UPDATE YET TO PLAY CARDS ARRAY
+        gameInfoEdit.player_cards_not_played = updateCardsNotPlayed
 
-    // add general strength points
-    gameInfoEdit.player_points = gameInfoEdit.player_points
-        ? +gameInfoEdit.player_points + +cardSelected?.strength
-        : +cardSelected?.strength
+        // add general strength points
+        gameInfoEditOpp.player_points = gameInfoEditOpp.player_points
+            ? +gameInfoEditOpp.player_points + +cardSelected?.strength
+            : +cardSelected?.strength
+    }
 
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}

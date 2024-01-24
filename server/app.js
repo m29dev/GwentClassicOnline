@@ -49,9 +49,19 @@ io.on('connection', async (socket) => {
         })
 
         // on send init faction data (player chooses faction)
-        socket.on('gameInitFaction', async ({ room_id, game_id, faction }) => {
-            await handleGameInitFaction(socket, room_id, game_id, faction)
-        })
+        socket.on(
+            'gameInitFaction',
+            async ({ room_id, game_id, faction, cardsDeck, leaderDeck }) => {
+                await handleGameInitFaction(
+                    socket,
+                    room_id,
+                    game_id,
+                    faction,
+                    cardsDeck,
+                    leaderDeck
+                )
+            }
+        )
 
         // on card play
         socket.on(

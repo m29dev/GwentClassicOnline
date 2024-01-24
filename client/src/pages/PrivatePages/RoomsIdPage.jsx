@@ -46,13 +46,13 @@ const RoomsIdPage = () => {
         joinRoom()
     }, [joinRoom])
 
-    const gameInitFaction = async (faction) => {
-        socket.emit('gameInitFaction', {
-            room_id: id,
-            game_id: roomInfo?.roomGameId,
-            faction,
-        })
-    }
+    // const gameInitFaction = async (faction) => {
+    //     socket.emit('gameInitFaction', {
+    //         room_id: id,
+    //         game_id: roomInfo?.roomGameId,
+    //         faction,
+    //     })
+    // }
 
     // receive socket
     useEffect(() => {
