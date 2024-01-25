@@ -195,6 +195,7 @@ const GameFactionComponent = () => {
                         READY
                     </div>
                 </div>
+
                 {/* ABSOLUTE LEADERS BLOCK */}
                 {displayLeaders && (
                     <div className="center-box-absolute-leaders">
