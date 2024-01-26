@@ -6,7 +6,7 @@ import '../../pages/PrivatePages/PrivatePages.css'
 // import { setGameInfo } from '../../redux/authSlice'
 
 import { useOutletContext } from 'react-router-dom'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Popup from '../popup/Popup'
 import { useGameReadIdMutation } from '../../services/gameService'
 import { setGameInfo } from '../../redux/authSlice'
@@ -39,6 +39,13 @@ const GameComponent = () => {
             return console.log('select right row')
         }
 
+        if (cardSelected?.ability === 'medic') {
+            console.log('CARD IS A MEDIC')
+
+            setDisplayCardsToRetrieve(true)
+            return
+        }
+
         if (cardSelected?.ability === 'spy') {
             console.log('CARD IS A SPY')
         }
@@ -57,6 +64,28 @@ const GameComponent = () => {
             agile: isAgile,
             agileRow: _row,
         })
+    }
+
+    const [displayCardsToRetrieve, setDisplayCardsToRetrieve] = useState(false)
+    const handleSetCardToRetrieve = (card) => {
+        const cardSelected = structuredClone(
+            gameInfo?.gamePlayerCurrent?.player_card_selected
+        )
+
+        cardSelected.cardToRetrieve = card
+
+        // if all good send socket event
+        socket.emit('gameCardPlay', {
+            room_id: roomInfo?._id,
+            game_id: roomInfo?.roomGameId,
+            cardSelected,
+            agile: false,
+            agileRow: null,
+        })
+
+        setDisplayCardsToRetrieve(false)
+
+        console.log('card selected to be retrieved: ', card)
     }
 
     const handlePassRound = () => {
@@ -444,6 +473,31 @@ const GameComponent = () => {
 
             {/* ABSOLUTE POSITIONED INFO (PLAYER TURN, GAME UPDATES) */}
             <Popup></Popup>
+
+            {/* ABSOLUTE BLOCK CARDS TO RETRIEVE BY MEDIC CARD */}
+            {displayCardsToRetrieve && (
+                <div className="center-box-absolute-leaders">
+                    <div
+                        className="absolute-leaders-hide"
+                        onClick={() => setDisplayCardsToRetrieve(false)}
+                    >
+                        X
+                    </div>
+
+                    {gameInfo?.gamePlayerCurrent?.player_cards_to_retrieve?.map(
+                        (item, index) => (
+                            <div
+                                key={index}
+                                className="grid-item"
+                                style={{
+                                    backgroundImage: `url("/lg/${item?.deck}_${item?.filename}.jpg")`,
+                                }}
+                                onClick={() => handleSetCardToRetrieve(item)}
+                            ></div>
+                        )
+                    )}
+                </div>
+            )}
         </div>
     )
 }

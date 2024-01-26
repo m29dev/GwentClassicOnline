@@ -53,6 +53,41 @@ const handleGameInitFaction = async (
         player_card_selected: {},
         player_cards_current: currentDeck, // all cards YET to play
         player_cards_played: [], // add each played card here
+
+        // TEST
+        player_cards_to_retrieve: [
+            {
+                name: 'Siege Tower',
+                id: '81',
+                deck: 'realms',
+                row: 'siege',
+                strength: '6',
+                ability: '',
+                filename: 'siege_tower',
+                count: '1',
+            },
+            {
+                name: 'Siegfried of Denesle',
+                id: '83',
+                deck: 'realms',
+                row: 'close',
+                strength: '5',
+                ability: '',
+                filename: 'siegfried',
+                count: '1',
+            },
+            {
+                name: 'Sigismund Dijkstra',
+                id: '89',
+                deck: 'realms',
+                row: 'close',
+                strength: '4',
+                ability: 'spy',
+                filename: 'dijkstra',
+                count: '1',
+            },
+        ],
+
         player_round_active: true,
 
         // variable info, clear each round
@@ -153,6 +188,12 @@ const handleGameCardPlay = async (
         calcGameTurn = gameInfoEditOpp.player_name
     }
 
+    // CHECK IF CARD IS A MEDIC
+    let isMedic = false
+    if (cardSelected?.ability === 'medic') {
+        isMedic = true
+    }
+
     // REMOVE PLAYED CARD FROM CURRENT CARDS
     let updatedArray = []
     gameInfoEdit?.player_cards_current?.map((item) => {
@@ -161,6 +202,17 @@ const handleGameCardPlay = async (
         }
     })
     gameInfoEdit.player_cards_current = updatedArray
+
+    // IF MEDIC, REMOVE RETRIEVED CARD FROM CARD TO RETRIEVE ARRAY
+    if (isMedic) {
+        let updatedArray = []
+        gameInfoEdit?.player_cards_to_retrieve?.map((item) => {
+            if (item?.id !== cardSelected?.cardToRetrieve?.id) {
+                updatedArray.push(item)
+            }
+        })
+        gameInfoEdit.player_cards_to_retrieve = updatedArray
+    }
 
     // CHECK IF CARD IS A SPY
     isSpy = false
@@ -176,10 +228,14 @@ const handleGameCardPlay = async (
                 if (row?.board_row === cardSelected?.row) {
                     row.board_row_cards.push(cardSelected)
 
+                    if (isMedic) {
+                        row.board_row_cards.push(cardSelected?.cardToRetrieve)
+                    }
+
                     // add row strength points
-                    row.board_row_points = row.board_row_points
-                        ? +row.board_row_points + +cardSelected?.strength
-                        : +cardSelected?.strength
+                    // row.board_row_points = row.board_row_points
+                    //     ? +row.board_row_points + +cardSelected?.strength
+                    //     : +cardSelected?.strength
                 }
             })
         }
@@ -190,9 +246,9 @@ const handleGameCardPlay = async (
                     row.board_row_cards.push(cardSelected)
 
                     // add row strength points
-                    row.board_row_points = row.board_row_points
-                        ? +row.board_row_points + +cardSelected?.strength
-                        : +cardSelected?.strength
+                    // row.board_row_points = row.board_row_points
+                    //     ? +row.board_row_points + +cardSelected?.strength
+                    //     : +cardSelected?.strength
                 }
             })
         }
@@ -200,9 +256,9 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_played.push(cardSelected)
 
         // add general strength points
-        gameInfoEdit.player_points = gameInfoEdit.player_points
-            ? +gameInfoEdit.player_points + +cardSelected?.strength
-            : +cardSelected?.strength
+        // gameInfoEdit.player_points = gameInfoEdit.player_points
+        //     ? +gameInfoEdit.player_points + +cardSelected?.strength
+        //     : +cardSelected?.strength
     }
 
     // ADD PLAYED CARD TO THE BOARD ARRAY
@@ -213,9 +269,9 @@ const handleGameCardPlay = async (
                 row.board_row_cards.push(cardSelected)
 
                 // add row strength points
-                row.board_row_points = row.board_row_points
-                    ? +row.board_row_points + +cardSelected?.strength
-                    : +cardSelected?.strength
+                // row.board_row_points = row.board_row_points
+                //     ? +row.board_row_points + +cardSelected?.strength
+                //     : +cardSelected?.strength
             }
         })
 
@@ -289,6 +345,24 @@ const handleGameCardPlay = async (
 
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
+
+    // CALCULATE STRENGTH POINTS:
+    // 1. ROW STRENGTH POINTS
+    let globalStrength = 0
+    gameInfoEdit.player_cards_board.map((row) => {
+        let rowStrength = 0
+        row.board_row_cards.map((item) => {
+            rowStrength = +rowStrength + +item.strength
+        })
+
+        console.log(358, 'new row strength is: ', rowStrength)
+
+        row.board_row_points = +rowStrength
+        globalStrength = +globalStrength + +rowStrength
+    })
+
+    // 2. GLOBAL STRENGTH POINTS
+    gameInfoEdit.player_points = +globalStrength
 
     // CHECK IF ALL CARD BEEN PLAYED
     if (gameInfoEdit.player_cards_current.length === 0) {
