@@ -188,12 +188,6 @@ const handleGameCardPlay = async (
         calcGameTurn = gameInfoEditOpp.player_name
     }
 
-    // CHECK IF CARD IS A MEDIC
-    let isMedic = false
-    if (cardSelected?.ability === 'medic') {
-        isMedic = true
-    }
-
     // REMOVE PLAYED CARD FROM CURRENT CARDS
     let updatedArray = []
     gameInfoEdit?.player_cards_current?.map((item) => {
@@ -203,8 +197,14 @@ const handleGameCardPlay = async (
     })
     gameInfoEdit.player_cards_current = updatedArray
 
-    // IF MEDIC, REMOVE RETRIEVED CARD FROM CARD TO RETRIEVE ARRAY
+    // CHECK IF CARD IS A MEDIC
+    let isMedic = false
+    if (cardSelected?.ability === 'medic') {
+        isMedic = true
+    }
+
     if (isMedic) {
+        // IF MEDIC, REMOVE RETRIEVED CARD FROM CARD TO RETRIEVE ARRAY
         let updatedArray = []
         gameInfoEdit?.player_cards_to_retrieve?.map((item) => {
             if (item?.id !== cardSelected?.cardToRetrieve?.id) {
@@ -212,6 +212,54 @@ const handleGameCardPlay = async (
             }
         })
         gameInfoEdit.player_cards_to_retrieve = updatedArray
+
+        // IF CARD TO RETREIVE BY MEDIC IS NOT A SPY
+        if (isMedic && cardSelected?.cardToRetrieve?.ability !== 'spy') {
+            gameInfoEdit.player_cards_board.map((row) => {
+                if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
+                    row.board_row_cards.push(cardSelected?.cardToRetrieve)
+
+                    //add row strength points
+                    row.board_row_points = row.board_row_points
+                        ? +row.board_row_points +
+                          +cardSelected?.cardToRetrieve?.strength
+                        : +cardSelected?.cardToRetrieve?.strength
+                }
+            })
+        }
+
+        // IF CARD TO RETREIVE BY MEDIC IS A SPY
+        if (isMedic && cardSelected?.cardToRetrieve?.ability === 'spy') {
+            // ADD THE SPY CARD TO THE OPP'S BOARD
+            gameInfoEditOpp.player_cards_board.map((row) => {
+                if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
+                    row.board_row_cards.push(cardSelected?.cardToRetrieve)
+
+                    //add row strength points
+                    row.board_row_points = row.board_row_points
+                        ? +row.board_row_points +
+                          +cardSelected?.cardToRetrieve?.strength
+                        : +cardSelected?.cardToRetrieve?.strength
+                }
+            })
+
+            // ADD 2 RANDOM CARD TO CURR'S PLAYER CARDS_CURRENT ARRAY
+            const updateCardsNotPlayed = []
+            gameInfoEdit.player_cards_not_played.forEach((item, index) => {
+                if (index < 2) {
+                    gameInfoEdit.player_cards_current.push(item)
+                } else {
+                    updateCardsNotPlayed.push(item)
+                }
+            })
+            // UPDATE YET TO PLAY CARDS ARRAY
+            gameInfoEdit.player_cards_not_played = updateCardsNotPlayed
+
+            // add general strength points
+            gameInfoEditOpp.player_points = gameInfoEditOpp.player_points
+                ? +gameInfoEditOpp.player_points + +cardSelected?.strength
+                : +cardSelected?.strength
+        }
     }
 
     // CHECK IF CARD IS A SPY
@@ -227,15 +275,6 @@ const handleGameCardPlay = async (
             gameInfoEdit.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.row) {
                     row.board_row_cards.push(cardSelected)
-
-                    if (isMedic) {
-                        row.board_row_cards.push(cardSelected?.cardToRetrieve)
-                    }
-
-                    // add row strength points
-                    // row.board_row_points = row.board_row_points
-                    //     ? +row.board_row_points + +cardSelected?.strength
-                    //     : +cardSelected?.strength
                 }
             })
         }
@@ -269,9 +308,9 @@ const handleGameCardPlay = async (
                 row.board_row_cards.push(cardSelected)
 
                 // add row strength points
-                // row.board_row_points = row.board_row_points
-                //     ? +row.board_row_points + +cardSelected?.strength
-                //     : +cardSelected?.strength
+                row.board_row_points = row.board_row_points
+                    ? +row.board_row_points + +cardSelected?.strength
+                    : +cardSelected?.strength
             }
         })
 
