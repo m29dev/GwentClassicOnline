@@ -14,6 +14,9 @@ const gameSchema = mongoose.Schema(
         gameTurn: {
             type: String,
         },
+        gamePlayerBoth: {
+            type: Object,
+        },
     },
     { timestamps: true }
 )

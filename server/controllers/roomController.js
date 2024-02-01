@@ -11,6 +11,7 @@ const room_create = async (req, res) => {
             gamePlayers: [],
             gameActive: false,
             gameTurn: '',
+            gamePlayerBoth: { weather_row_cards: [] },
         })
         const newGameCreated = await newGame.save()
         const gameId = newGameCreated._id

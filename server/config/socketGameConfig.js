@@ -1,5 +1,6 @@
 const { getFaction } = require('./factionConfig')
 const Game = require('../models/Game')
+const { handleCardMoraleService } = require('../services/cardAbilityService')
 
 const handleGameInitFaction = async (
     socket,
@@ -12,15 +13,22 @@ const handleGameInitFaction = async (
     console.log('game init')
 
     // RANDOMIZE INIT 10 STARTER CARDS
+    const shuffled = cardsDeck.sort(() => 0.5 - Math.random())
     const currentDeck = []
     const cardsDeckNotPlayed = []
-    cardsDeck.forEach((item, index) => {
+    shuffled.forEach((item, index) => {
         if (index < 10) {
             currentDeck.push(item)
         } else {
             cardsDeckNotPlayed.push(item)
         }
     })
+
+    // sort by the cards strength
+    const compareStrength = (a, b) => {
+        return a.strength - b.strength
+    }
+    currentDeck.sort(compareStrength)
 
     const game = await Game.findById({ _id: game_id })
 
@@ -124,6 +132,7 @@ const handleGameInitFaction = async (
         gameRound: initGame.gameRound,
         gamePlayerCurrent: playerOpp ? playerOpp : {},
         gamePlayerOpponent: player_0,
+        gamePlayerBoth: initGame?.gamePlayerBoth,
         gameTurn: player_0?.player_name,
     }
     // socket.nsp.to(room_id).emit('gameInfoData', gameInfoOpp)
@@ -136,6 +145,7 @@ const handleGameInitFaction = async (
         gameRound: initGame.gameRound,
         gamePlayerCurrent: player_0,
         gamePlayerOpponent: playerOpp ? playerOpp : {},
+        gamePlayerBoth: initGame?.gamePlayerBoth,
         gameTurn: player_0?.player_name,
     }
     socket.nsp.to(socket.id).emit('gameInfoData', gameInfoCurr)
@@ -196,6 +206,22 @@ const handleGameCardPlay = async (
         }
     })
     gameInfoEdit.player_cards_current = updatedArray
+
+    let isWeather = false
+    if (cardSelected?.deck === 'weather') {
+        // add weather card to the weather array
+        // gameInfoEdit.player_cards_board[3].board_row_cards.push(cardSelected)
+        isWeather = true
+
+        game.gamePlayerBoth.weather_row_cards.push(cardSelected)
+
+        console.log(214, 'WEATHER HAS BEEN DETECTED')
+
+        // ({
+        //     board_row: 'weather',
+        //     board_row_cards: [cardSelected],
+        // })
+    }
 
     // CHECK IF CARD IS A MEDIC
     let isMedic = false
@@ -270,7 +296,7 @@ const handleGameCardPlay = async (
 
     // ADD PLAYED CARD TO THE BOARD ARRAY
     // NOT A SPY
-    if (!isSpy) {
+    if (!isSpy && !isWeather) {
         if (!agile) {
             gameInfoEdit.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.row) {
@@ -382,6 +408,10 @@ const handleGameCardPlay = async (
         // })
     }
 
+    // calc strength if any morale cards detected
+    const updatedGameInfoEdit = handleCardMoraleService(gameInfoEdit)
+    gameInfoEdit = updatedGameInfoEdit
+
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
 
@@ -394,10 +424,14 @@ const handleGameCardPlay = async (
             rowStrength = +rowStrength + +item.strength
         })
 
-        console.log(358, 'new row strength is: ', rowStrength)
-
         row.board_row_points = +rowStrength
         globalStrength = +globalStrength + +rowStrength
+
+        // sort by the cards strength
+        const compareStrength = (a, b) => {
+            return a.strength - b.strength
+        }
+        row.board_row_cards.sort(compareStrength)
     })
 
     // 2. GLOBAL STRENGTH POINTS
@@ -439,6 +473,7 @@ const handleGameCardPlay = async (
             gameInfo: [gameInfoEdit, gameInfoEditOpp],
             gameTurn: calcGameTurn,
             gameActive: gameActiveUpdate,
+            gamePlayerBoth: game.gamePlayerBoth,
         }
     )
 
@@ -450,6 +485,7 @@ const handleGameCardPlay = async (
         gameTurn: calcGameTurn,
         gamePlayerCurrent: gameInfoEditOpp,
         gamePlayerOpponent: gameInfoEdit,
+        gamePlayerBoth: game.gamePlayerBoth,
     }
     socket.to(room_id).emit('gameInfoData', gameInfoOpp)
 
@@ -461,6 +497,7 @@ const handleGameCardPlay = async (
         gameTurn: calcGameTurn,
         gamePlayerCurrent: gameInfoEdit,
         gamePlayerOpponent: gameInfoEditOpp,
+        gamePlayerBoth: game.gamePlayerBoth,
     }
     socket.nsp.to(socket.id).emit('gameInfoData', gameInfoCurr)
 }

@@ -29,10 +29,15 @@ const GameComponent = () => {
             return console.log('cannot play now')
         }
 
-        // check if cardSelected's row is equal to clicked row
         if (cardSelected?.row !== 'agile' && _row !== cardSelected?.row) {
+            // check if cardSelected's row is equal to clicked row
             return console.log('select right row')
         }
+
+        // check if cardSelected is a weather card
+        // if (cardSelected?.row === 'weather') {
+        //     return console.log('WEATHER CARD SELECTED')
+        // }
 
         // check if cardSelected's row is agile and row is not siege
         if (cardSelected?.row === 'agile' && _row === 'siege') {
@@ -166,7 +171,28 @@ const GameComponent = () => {
                         {gameInfo?.gamePlayerOpponent?.player_points}
                     </div>
                 </div>
-                <div className="weather-box"></div>
+
+                {/* WEATHER BOX */}
+                <div
+                    // className="weather-box"
+
+                    className={
+                        gameInfo?.gamePlayerCurrent?.player_card_selected
+                            ?.row === 'weather'
+                            ? 'weather-box row-common-active'
+                            : 'weather-box'
+                    }
+                    onClick={() => handlePlayCard('weather')}
+                >
+                    {gameInfo?.gamePlayerBoth?.weather_row_cards?.map(
+                        (item, index) => (
+                            <CardPlayedComponent
+                                key={index}
+                                card={item}
+                            ></CardPlayedComponent>
+                        )
+                    )}
+                </div>
 
                 {/* PLAYER CURR INFO */}
                 <div

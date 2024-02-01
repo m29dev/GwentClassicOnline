@@ -147,6 +147,8 @@
     border: #fff solid 1px;
     margin-left: 137px;
     margin-top: 240px;
+
+    display: flex;
 }
 
 /* CENTER SIDE */
