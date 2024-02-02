@@ -23,7 +23,11 @@ const CardPlayedComponent = (card) => {
                         backgroundImage: `url("/icons/power_normal_icon.png")`,
                     }}
                 >
-                    <div className="card-power">{card?.card?.strength}</div>
+                    <div className="card-power">
+                        {card?.card?.strengthWeather
+                            ? card?.card?.strengthWeather
+                            : card?.card?.strength}
+                    </div>
                 </div>
             )}
 

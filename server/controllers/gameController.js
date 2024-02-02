@@ -166,6 +166,7 @@ const game_read_id = async (req, res) => {
             gameId: gameInfoObject._id,
             gamePlayerCurrent: gameInfoCurrent,
             gamePlayerOpponent: gameInfoOpponent,
+            gamePlayerBoth: gameInfoObject.gamePlayerBoth,
             gameTurn: gameInfoObject.gameTurn,
         }
 

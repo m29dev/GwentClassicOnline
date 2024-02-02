@@ -207,13 +207,28 @@ const handleGameCardPlay = async (
     })
     gameInfoEdit.player_cards_current = updatedArray
 
+    // CHECK IF CARD IS A WEATHER
     let isWeather = false
     if (cardSelected?.deck === 'weather') {
         // add weather card to the weather array
         // gameInfoEdit.player_cards_board[3].board_row_cards.push(cardSelected)
         isWeather = true
 
-        game.gamePlayerBoth.weather_row_cards.push(cardSelected)
+        // check if weather card with same  ability is already in the game
+        isDuplicat = false
+        game.gamePlayerBoth.weather_row_cards.forEach((weather) => {
+            if (weather.ability === cardSelected?.ability) {
+                isDuplicat = true
+            }
+        })
+
+        if (!isDuplicat) {
+            if (cardSelected?.ability === 'clear') {
+                game.gamePlayerBoth.weather_row_cards = [cardSelected]
+            } else {
+                game.gamePlayerBoth.weather_row_cards.push(cardSelected)
+            }
+        }
 
         console.log(214, 'WEATHER HAS BEEN DETECTED')
 
@@ -415,13 +430,73 @@ const handleGameCardPlay = async (
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
 
+    // CHECK ALL WEATHER CARDS (WILL BE NEEDED IN CALCULATION OF THE CARD'S STRENGTH)
+    game.gamePlayerBoth.weather_row_cards.map((item) => {
+        // close
+        if (item.ability === 'frost') {
+            // change strength of the row's cards
+            gameInfoEdit.player_cards_board[0].board_row_cards.map((item) => {
+                if (item.ability !== 'hero') item.strengthWeather = 1
+            })
+            gameInfoEditOpp.player_cards_board[0].board_row_cards.map(
+                (item) => {
+                    if (item.ability !== 'hero') item.strengthWeather = 1
+                }
+            )
+        }
+
+        // ranged
+        if (item.ability === 'fog') {
+            gameInfoEdit.player_cards_board[1].board_row_cards.map((item) => {
+                if (item.ability !== 'hero') item.strengthWeather = 1
+            })
+            gameInfoEditOpp.player_cards_board[1].board_row_cards.map(
+                (item) => {
+                    if (item.ability !== 'hero') item.strengthWeather = 1
+                }
+            )
+        }
+
+        // siege
+        if (item.ability === 'rain') {
+            gameInfoEdit.player_cards_board[2].board_row_cards.map((item) => {
+                if (item.ability !== 'hero') item.strengthWeather = 1
+            })
+            gameInfoEditOpp.player_cards_board[2].board_row_cards.map(
+                (item) => {
+                    if (item.ability !== 'hero') item.strengthWeather = 1
+                }
+            )
+        }
+
+        // CLEAR WEATHER
+        if (item.ability === 'clear') {
+            console.log('strengthWeather CLEARED')
+
+            gameInfoEdit.player_cards_board.map((row) => {
+                row.board_row_cards.map((item) => {
+                    delete item.strengthWeather
+                })
+            })
+            gameInfoEditOpp.player_cards_board.map((row) => {
+                row.board_row_cards.map((item) => {
+                    delete item.strengthWeather
+                })
+            })
+        }
+    })
+
     // CALCULATE STRENGTH POINTS:
     // 1. ROW STRENGTH POINTS
     let globalStrength = 0
     gameInfoEdit.player_cards_board.map((row) => {
         let rowStrength = 0
         row.board_row_cards.map((item) => {
-            rowStrength = +rowStrength + +item.strength
+            if (item.strengthWeather) {
+                rowStrength = +rowStrength + +1
+            } else {
+                rowStrength = +rowStrength + +item.strength
+            }
         })
 
         row.board_row_points = +rowStrength
@@ -434,8 +509,30 @@ const handleGameCardPlay = async (
         row.board_row_cards.sort(compareStrength)
     })
 
+    let globalStrengthOpp = 0
+    gameInfoEditOpp.player_cards_board.map((row) => {
+        let rowStrength = 0
+        row.board_row_cards.map((item) => {
+            if (item.strengthWeather) {
+                rowStrength = +rowStrength + +1
+            } else {
+                rowStrength = +rowStrength + +item.strength
+            }
+        })
+
+        row.board_row_points = +rowStrength
+        globalStrengthOpp = +globalStrengthOpp + +rowStrength
+
+        // sort by the cards strength
+        const compareStrength = (a, b) => {
+            return a.strength - b.strength
+        }
+        row.board_row_cards.sort(compareStrength)
+    })
+
     // 2. GLOBAL STRENGTH POINTS
     gameInfoEdit.player_points = +globalStrength
+    gameInfoEditOpp.player_points = +globalStrengthOpp
 
     // CHECK IF ALL CARD BEEN PLAYED
     if (gameInfoEdit.player_cards_current.length === 0) {
