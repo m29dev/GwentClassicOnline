@@ -63,38 +63,38 @@ const handleGameInitFaction = async (
         player_cards_played: [], // add each played card here
 
         // TEST
-        player_cards_to_retrieve: [
-            {
-                name: 'Siege Tower',
-                id: '81',
-                deck: 'realms',
-                row: 'siege',
-                strength: '6',
-                ability: '',
-                filename: 'siege_tower',
-                count: '1',
-            },
-            {
-                name: 'Siegfried of Denesle',
-                id: '83',
-                deck: 'realms',
-                row: 'close',
-                strength: '5',
-                ability: '',
-                filename: 'siegfried',
-                count: '1',
-            },
-            {
-                name: 'Sigismund Dijkstra',
-                id: '89',
-                deck: 'realms',
-                row: 'close',
-                strength: '4',
-                ability: 'spy',
-                filename: 'dijkstra',
-                count: '1',
-            },
-        ],
+        // player_cards_to_retrieve: [
+        //     {
+        //         name: 'Siege Tower',
+        //         id: '81',
+        //         deck: 'realms',
+        //         row: 'siege',
+        //         strength: '6',
+        //         ability: '',
+        //         filename: 'siege_tower',
+        //         count: '1',
+        //     },
+        //     {
+        //         name: 'Siegfried of Denesle',
+        //         id: '83',
+        //         deck: 'realms',
+        //         row: 'close',
+        //         strength: '5',
+        //         ability: '',
+        //         filename: 'siegfried',
+        //         count: '1',
+        //     },
+        //     {
+        //         name: 'Sigismund Dijkstra',
+        //         id: '89',
+        //         deck: 'realms',
+        //         row: 'close',
+        //         strength: '4',
+        //         ability: 'spy',
+        //         filename: 'dijkstra',
+        //         count: '1',
+        //     },
+        // ],
 
         player_round_active: true,
 
