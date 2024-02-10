@@ -1,17 +1,33 @@
 import './card.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { setGameInfo } from '../../../redux/authSlice'
+import { useSelector } from 'react-redux'
+import { useOutletContext } from 'react-router-dom'
 
-const CardComponent = (card) => {
-    const { gameInfo } = useSelector((state) => state.auth)
+const CardPlayedCurrentComponent = (card) => {
+    const { gameInfo, roomInfo } = useSelector((state) => state.auth)
+    const [socket] = useOutletContext()
 
-    const dispatch = useDispatch()
+    // PLAY DECOY CARD (SELECT CARD TO SWAP WITH DECOY CARD)
+    const handleSelectPlayedCard = (c) => {
+        if (
+            gameInfo?.gamePlayerCurrent?.player_card_selected?.ability ===
+            'decoy'
+        ) {
+            console.log('DECOY TEST CARD SELECT: ', c)
+        }
 
-    const handlePlayCard = () => {
-        const gameInfoEdit = structuredClone(gameInfo)
-        gameInfoEdit.gamePlayerCurrent.player_card_selected = card?.card
+        const cardSelected = structuredClone(
+            gameInfo?.gamePlayerCurrent?.player_card_selected
+        )
 
-        dispatch(setGameInfo(gameInfoEdit))
+        cardSelected.cardToSwap = c
+
+        socket.emit('gameCardPlay', {
+            room_id: roomInfo?._id,
+            game_id: roomInfo?.roomGameId,
+            cardSelected,
+            agile: false,
+            agileRow: null,
+        })
     }
 
     return (
@@ -20,7 +36,9 @@ const CardComponent = (card) => {
             style={{
                 backgroundImage: `url("/sm/${card?.card?.deck}_${card?.card?.filename}.jpg")`,
             }}
-            onClick={handlePlayCard}
+            onClick={() => {
+                handleSelectPlayedCard(card)
+            }}
         >
             <div
                 className="card-border"
@@ -37,7 +55,11 @@ const CardComponent = (card) => {
                         backgroundImage: `url("/icons/power_normal_icon.png")`,
                     }}
                 >
-                    <div className="card-power">{card?.card?.strength}</div>
+                    <div className="card-power">
+                        {card?.card?.strengthWeather
+                            ? card?.card?.strengthWeather
+                            : card?.card?.strength}
+                    </div>
                 </div>
             )}
 
@@ -90,4 +112,4 @@ const CardComponent = (card) => {
     )
 }
 
-export default CardComponent
+export default CardPlayedCurrentComponent

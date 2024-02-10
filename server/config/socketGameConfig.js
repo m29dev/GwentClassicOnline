@@ -238,6 +238,55 @@ const handleGameCardPlay = async (
         // })
     }
 
+    // CHECK IF CARD IS A SCORCH
+    if (
+        cardSelected?.ability === 'scorch' &&
+        gameInfoEditOpp.player_cards_board[0].board_row_points >= 10
+    ) {
+        let strongestCard = { strength: -1 }
+        gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
+            if (item.ability !== 'hero') {
+                strongestCard =
+                    item?.strength > strongestCard?.strength
+                        ? item
+                        : strongestCard
+            }
+        })
+
+        const updatedArray = []
+        gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
+            if (item.id !== strongestCard.id) {
+                updatedArray.push(item)
+            }
+        })
+
+        gameInfoEditOpp.player_cards_board[0].board_row_cards = updatedArray
+        gameInfoEditOpp.player_cards_to_retrieve.push(strongestCard)
+    }
+
+    // CHECK IF CARD IS A DECOY
+    if (cardSelected?.ability === 'decoy') {
+        const cardToSwap = cardSelected?.cardToSwap?.card
+        delete cardSelected.cardToSwap
+
+        gameInfoEdit.player_cards_board.map((row) => {
+            if (row?.board_row === cardToSwap?.row) {
+                const updateArray = []
+
+                row.board_row_cards.map((item) => {
+                    if (item?.id !== cardToSwap?.id) {
+                        updateArray.push(item)
+                    }
+                })
+                updateArray.push(cardSelected)
+
+                row.board_row_cards = updateArray
+            }
+        })
+
+        gameInfoEdit.player_cards_current.push(cardToSwap)
+    }
+
     // CHECK IF CARD IS A MEDIC
     let isMedic = false
     if (cardSelected?.ability === 'medic') {
@@ -305,7 +354,10 @@ const handleGameCardPlay = async (
 
     // CHECK IF CARD IS A SPY
     isSpy = false
-    if (cardSelected?.ability === 'spy') {
+    if (
+        cardSelected?.ability === 'spy' ||
+        cardSelected?.ability === 'hero spy'
+    ) {
         isSpy = true
     }
 

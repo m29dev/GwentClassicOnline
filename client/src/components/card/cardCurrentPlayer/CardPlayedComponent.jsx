@@ -32,7 +32,9 @@ const CardPlayedComponent = (card) => {
             )}
 
             {/* display strength hero icon if card has hero ability */}
-            {card?.card?.strength && card?.card?.ability === 'hero' && (
+            {((card?.card?.strength && card?.card?.ability === 'hero') ||
+                (card?.card?.strength &&
+                    card?.card?.ability === 'hero spy')) && (
                 <div
                     className="card-power-hero-box"
                     style={{
@@ -61,6 +63,16 @@ const CardPlayedComponent = (card) => {
                     className="card-ability-box"
                     style={{
                         backgroundImage: `url("/icons/card_ability_${card?.card?.ability}.png")`,
+                    }}
+                ></div>
+            )}
+
+            {/* display spy if hero spy */}
+            {card?.card?.ability === 'hero spy' && (
+                <div
+                    className="card-ability-box"
+                    style={{
+                        backgroundImage: `url("/icons/card_ability_spy.png")`,
                     }}
                 ></div>
             )}

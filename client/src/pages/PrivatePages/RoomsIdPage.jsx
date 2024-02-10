@@ -4,12 +4,12 @@ import { useRoomReadMutation } from '../../services/roomService'
 import { useSelector, useDispatch } from 'react-redux'
 import { setGameInfo, setRoomInfo } from '../../redux/authSlice'
 import GameComponent from '../../components/game/GameComponent'
-import GameAfterComponent from '../../components/game/GameAfterComponent'
-import GameMenuComponent from '../../components/game/GameMenuComponent'
+// import GameAfterComponent from '../../components/game/GameAfterComponent'
+// import GameMenuComponent from '../../components/game/GameMenuComponent'
 import GameFactionComponent from '../../components/game/GameFactionComponent'
 
 const RoomsIdPage = () => {
-    const { userInfo, roomInfo, gameInfo } = useSelector((state) => state.auth)
+    const { userInfo, gameInfo } = useSelector((state) => state.auth)
     const [socket] = useOutletContext()
     const params = useParams()
     const dispatch = useDispatch()

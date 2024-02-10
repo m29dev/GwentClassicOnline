@@ -195,7 +195,12 @@ const game_factions = async (req, res) => {
             }
 
             cards.forEach((item) => {
-                if (item.deck === faction || item.deck === 'weather') {
+                if (
+                    item.deck === faction ||
+                    item.deck === 'weather' ||
+                    item.deck === 'special' ||
+                    item.deck === 'neutral'
+                ) {
                     item.row !== 'leader'
                         ? factionObject.cardsCollection.push(item)
                         : factionObject.leadersCollection.push(item)

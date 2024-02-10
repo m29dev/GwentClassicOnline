@@ -37,7 +37,7 @@ const AuthPage = () => {
     return (
         <>
             <div className="page-container">
-                <h1>Państwa Miasta</h1>
+                <h1>Gwint</h1>
 
                 <form className="form-container" onSubmit={handleAuth}>
                     <input

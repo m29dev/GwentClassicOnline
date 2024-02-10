@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Popup from '../popup/Popup'
 import { useGameReadIdMutation } from '../../services/gameService'
 import { setGameInfo } from '../../redux/authSlice'
+import CardPlayedCurrentComponent from '../card/cardCurrentPlayer/CardPlayedCurrentComponent'
 
 const GameComponent = () => {
     const { userInfo, gameInfo, roomInfo } = useSelector((state) => state.auth)
@@ -264,7 +265,7 @@ const GameComponent = () => {
                 {/* ROW BOX OPP */}
                 <div className="row-box-player0">
                     {/* ROW SIEGE */}
-                    <div className="row">
+                    <div className="row row-opp-siege">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerOpponent
@@ -276,8 +277,11 @@ const GameComponent = () => {
                             className={
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row === 'siege' &&
-                                gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability === 'spy'
+                                (gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy' ||
+                                    gameInfo?.gamePlayerCurrent
+                                        ?.player_card_selected?.ability ===
+                                        'hero spy')
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -297,7 +301,7 @@ const GameComponent = () => {
                     </div>
 
                     {/* ROW RANGED */}
-                    <div className="row">
+                    <div className="row row-opp-ranged">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerOpponent
@@ -309,8 +313,11 @@ const GameComponent = () => {
                             className={
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row === 'ranged' &&
-                                gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability === 'spy'
+                                (gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy' ||
+                                    gameInfo?.gamePlayerCurrent
+                                        ?.player_card_selected?.ability ===
+                                        'hero spy')
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -330,7 +337,7 @@ const GameComponent = () => {
                     </div>
 
                     {/* ROW CLOSE */}
-                    <div className="row">
+                    <div className="row row-opp-close">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerOpponent
@@ -342,8 +349,11 @@ const GameComponent = () => {
                             className={
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row === 'close' &&
-                                gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability === 'spy'
+                                (gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability === 'spy' ||
+                                    gameInfo?.gamePlayerCurrent
+                                        ?.player_card_selected?.ability ===
+                                        'hero spy')
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -366,7 +376,7 @@ const GameComponent = () => {
                 {/* ROW BOX CURRENT PLAYER */}
                 <div className="row-box-player1">
                     {/* ROW CLOSE */}
-                    <div className="row">
+                    <div className="row row-cur-close">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerCurrent
@@ -380,7 +390,10 @@ const GameComponent = () => {
                                     ?.player_card_selected?.row ===
                                     ('close' || 'agile') &&
                                 gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability !== 'spy'
+                                    ?.player_card_selected?.ability !== 'spy' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !==
+                                    'hero spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -390,17 +403,22 @@ const GameComponent = () => {
                                 userInfo?.nickname &&
                                 gameInfo?.gamePlayerCurrent?.player_cards_board?.[0]?.board_row_cards?.map(
                                     (item, index) => (
-                                        <CardPlayedComponent
+                                        // <CardPlayedComponent
+                                        //     key={index}
+                                        //     card={item}
+                                        // ></CardPlayedComponent>
+
+                                        <CardPlayedCurrentComponent
                                             key={index}
                                             card={item}
-                                        ></CardPlayedComponent>
+                                        ></CardPlayedCurrentComponent>
                                     )
                                 )}
                         </div>
                     </div>
 
                     {/* ROW RANGE */}
-                    <div className="row">
+                    <div className="row row-cur-ranged">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerCurrent
@@ -414,7 +432,10 @@ const GameComponent = () => {
                                     ?.player_card_selected?.row ===
                                     ('ranged' || 'agile') &&
                                 gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability !== 'spy'
+                                    ?.player_card_selected?.ability !== 'spy' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !==
+                                    'hero spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -424,17 +445,22 @@ const GameComponent = () => {
                                 userInfo?.nickname &&
                                 gameInfo?.gamePlayerCurrent?.player_cards_board?.[1]?.board_row_cards?.map(
                                     (item, index) => (
-                                        <CardPlayedComponent
+                                        // <CardPlayedComponent
+                                        //     key={index}
+                                        //     card={item}
+                                        // ></CardPlayedComponent>
+
+                                        <CardPlayedCurrentComponent
                                             key={index}
                                             card={item}
-                                        ></CardPlayedComponent>
+                                        ></CardPlayedCurrentComponent>
                                     )
                                 )}
                         </div>
                     </div>
 
                     {/* ROW SIEGE */}
-                    <div className="row">
+                    <div className="row row-cur-siege">
                         <div className="row-points">
                             {
                                 gameInfo?.gamePlayerCurrent
@@ -447,7 +473,10 @@ const GameComponent = () => {
                                 gameInfo?.gamePlayerCurrent
                                     ?.player_card_selected?.row === 'siege' &&
                                 gameInfo?.gamePlayerCurrent
-                                    ?.player_card_selected?.ability !== 'spy'
+                                    ?.player_card_selected?.ability !== 'spy' &&
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.ability !==
+                                    'hero spy'
                                     ? 'row-common-card-box row-common-active'
                                     : 'row-common-card-box'
                             }
@@ -457,10 +486,15 @@ const GameComponent = () => {
                                 userInfo?.nickname &&
                                 gameInfo?.gamePlayerCurrent?.player_cards_board?.[2]?.board_row_cards?.map(
                                     (item, index) => (
-                                        <CardPlayedComponent
+                                        // <CardPlayedComponent
+                                        //     key={index}
+                                        //     card={item}
+                                        // ></CardPlayedComponent>
+
+                                        <CardPlayedCurrentComponent
                                             key={index}
                                             card={item}
-                                        ></CardPlayedComponent>
+                                        ></CardPlayedCurrentComponent>
                                     )
                                 )}
                         </div>
