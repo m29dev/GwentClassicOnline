@@ -538,6 +538,13 @@ const handleGameCardPlay = async (
         }
     })
 
+    // sort by the cards strength
+    const compareStrength = (a, b) => {
+        return a.strength - b.strength
+    }
+    gameInfoEdit.player_cards_current.sort(compareStrength)
+    gameInfoEditOpp.player_cards_current.sort(compareStrength)
+
     // CALCULATE STRENGTH POINTS:
     // 1. ROW STRENGTH POINTS
     let globalStrength = 0

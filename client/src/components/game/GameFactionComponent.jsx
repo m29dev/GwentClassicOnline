@@ -122,30 +122,109 @@ const GameFactionComponent = () => {
         }
     }, [menuInfo, handleFetchFactions])
 
+    // CALC CURRENT DECK NUMS
+    const [cardDeckNum, setCardDeckNum] = useState(null)
+    const [cardUnitNum, setCardUnitNum] = useState(null)
+    const [cardSpecialNum, setCardSpecialNum] = useState(null)
+    const [cardStrengthNum, setCardStrengthNum] = useState(null)
+    const [cardHeroNum, setCardHeroNum] = useState(null)
+    useEffect(() => {
+        let unit = 0
+        let special = 0
+        let strength = 0
+        let hero = 0
+
+        menuInfo?.factions?.[menuInfo?.factionId]?.cardsDeck?.map((item) => {
+            // unit
+            if (item?.ability !== 'special' && item?.ability !== 'weather') {
+                unit += 1
+            }
+
+            // special
+            if (item?.ability === 'special') {
+                special += 1
+            }
+
+            // strength
+            if (item?.strength) {
+                if (item?.ability === 'spy') {
+                    strength -= +item?.strength
+                } else {
+                    strength += +item?.strength
+                }
+            }
+
+            // hero
+            if (item?.ability.includes('hero')) {
+                hero += 1
+            }
+        })
+
+        setCardDeckNum(
+            menuInfo?.factions?.[menuInfo?.factionId]?.cardsDeck?.length
+        )
+        setCardUnitNum(unit)
+        setCardSpecialNum(special)
+        setCardStrengthNum(strength)
+        setCardHeroNum(hero)
+    }, [menuInfo])
+
     return (
         <div className="faction-box">
             <div className="navbar">
-                <div className="navbar-left">Kolekcja Kart</div>
+                <div className="navbar-left">
+                    <div className="navbar-txt">Kolekcja Kart</div>
+                </div>
 
                 <div className="navbar-center">
                     <div
                         className="btn-prev"
                         onClick={() => handleChangePage('prev')}
                     >
-                        prev
+                        {
+                            menuInfo?.factions?.[
+                                menuInfo?.factionId - 1 < 0
+                                    ? menuInfo?.factions?.length - 1
+                                    : menuInfo?.factionId - 1
+                            ]?.faction
+                        }
                     </div>
 
-                    {menuInfo?.factions?.[menuInfo?.factionId]?.faction}
+                    <div className="deck-center">
+                        <div className="">
+                            <h1>
+                                {
+                                    menuInfo?.factions?.[menuInfo?.factionId]
+                                        ?.faction
+                                }
+                            </h1>
+                        </div>
+                    </div>
+
+                    <img
+                        src={`/icons/deck_shield_${
+                            menuInfo?.factions?.[menuInfo?.factionId]?.faction
+                        }.png`}
+                    />
 
                     <div
                         className="btn-next"
                         onClick={() => handleChangePage('next')}
                     >
-                        next
+                        {
+                            menuInfo?.factions?.[
+                                menuInfo?.factionId + 1 >
+                                menuInfo?.factions?.length - 1
+                                    ? 0
+                                    : menuInfo?.factionId + 1
+                            ]?.faction
+                        }
                     </div>
                 </div>
 
-                <div className="navbar-right">Karty w Talii</div>
+                <div className="navbar-right">
+                    <div className="navbar-txt">Karty w Talii</div>
+                </div>
             </div>
 
             <div className="main-box">
@@ -191,7 +270,43 @@ const GameFactionComponent = () => {
                         onClick={() => setDisplayLeaders(true)}
                     ></div>
 
-                    <div className="btn-start" onClick={handleGameInitFaction}>
+                    <div className="faction-info">
+                        <p>Wszystkie karty w talii</p>
+                        <div className="faction-info-row">
+                            <img src="/icons/deck_stats_count.png" />
+                            <p>{cardDeckNum}</p>
+                        </div>
+
+                        <p>Liczba kart jednostek</p>
+                        <div className="faction-info-row">
+                            <img src="/icons/deck_stats_unit.png" />
+                            <p>{cardUnitNum}</p>
+                        </div>
+
+                        <p>Karty specjalne</p>
+                        <div className="faction-info-row">
+                            <img src="/icons/deck_stats_special.png" />
+                            <p>{cardSpecialNum}</p>
+                        </div>
+
+                        <p>Całkowita siła jednostek</p>
+                        <div className="faction-info-row">
+                            <img src="/icons/deck_stats_strength.png" />
+                            <p>{cardStrengthNum}</p>
+                        </div>
+
+                        <p>Karty bohaterów</p>
+                        <div className="faction-info-row">
+                            <img src="/icons/deck_stats_hero.png" />
+                            <p>{cardHeroNum}</p>
+                        </div>
+                    </div>
+
+                    <div
+                        className="btn-universal"
+                        style={{ marginTop: '30px' }}
+                        onClick={handleGameInitFaction}
+                    >
                         READY
                     </div>
                 </div>

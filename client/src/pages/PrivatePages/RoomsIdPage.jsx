@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useParams, useOutletContext } from 'react-router-dom'
+import { useParams, useOutletContext, useNavigate } from 'react-router-dom'
 import { useRoomReadMutation } from '../../services/roomService'
 import { useSelector, useDispatch } from 'react-redux'
 import { setGameInfo, setRoomInfo } from '../../redux/authSlice'
@@ -75,6 +75,14 @@ const RoomsIdPage = () => {
 
         return () => socket.off('gameInfoData', handleGameInfoData)
     }, [socket, dispatch])
+
+    // CHECK IF USER IS AUTHENTICATED
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (!userInfo?.nickname) {
+            navigate('/auth')
+        }
+    }, [userInfo, navigate])
 
     // LISTEN FOR gameInfo CHANGES
     // useEffect(() => {

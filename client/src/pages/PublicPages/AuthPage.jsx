@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { setUserInfo } from '../../redux/authSlice'
+import { useNavigate } from 'react-router-dom'
 // import { useNavigate } from 'react-router-dom'
 import { Button } from 'react-bootstrap'
 
 const AuthPage = () => {
+    const { userInfo } = useSelector((state) => state.auth)
     const [nickname, setNickname] = useState('')
     const dispatch = useDispatch()
     // const navigate = useNavigate()
@@ -33,6 +35,14 @@ const AuthPage = () => {
             })
         )
     }
+
+    // CHECK IF USER IS AUTHENTICATED
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (userInfo?.nickname) {
+            navigate('/rooms')
+        }
+    }, [userInfo, navigate])
 
     return (
         <>
