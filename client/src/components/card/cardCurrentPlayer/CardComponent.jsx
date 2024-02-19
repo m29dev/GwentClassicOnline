@@ -1,6 +1,7 @@
 import './card.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { setGameInfo } from '../../../redux/authSlice'
+import { useEffect, useState } from 'react'
 
 const CardComponent = (card) => {
     const { gameInfo } = useSelector((state) => state.auth)
@@ -13,6 +14,12 @@ const CardComponent = (card) => {
 
         dispatch(setGameInfo(gameInfoEdit))
     }
+
+    const [cardAbilites, setCardAbilites] = useState(null)
+    useEffect(() => {
+        const arr = card?.card?.ability?.split(' ')
+        setCardAbilites(arr)
+    }, [card])
 
     return (
         <div
@@ -30,7 +37,7 @@ const CardComponent = (card) => {
             ></div>
 
             {/* display strength normal icon if card has no ability */}
-            {card?.card?.strength && card?.card?.ability !== 'hero' && (
+            {card?.card?.strength && !card?.card?.ability.includes('hero') && (
                 <div
                     className="card-power-box"
                     style={{
@@ -66,24 +73,15 @@ const CardComponent = (card) => {
             )}
 
             {/* display ability icon if exists */}
-            {card?.card?.ability && (
+            {cardAbilites?.map((item, index) => (
                 <div
+                    key={index}
                     className="card-ability-box"
                     style={{
-                        backgroundImage: `url("/icons/card_ability_${card?.card?.ability}.png")`,
+                        backgroundImage: `url("/icons/card_ability_${item}.png")`,
                     }}
                 ></div>
-            )}
-
-            {/* display spy if hero spy */}
-            {card?.card?.ability === 'hero spy' && (
-                <div
-                    className="card-ability-box"
-                    style={{
-                        backgroundImage: `url("/icons/card_ability_spy.png")`,
-                    }}
-                ></div>
-            )}
+            ))}
         </div>
     )
 }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import './card.css'
 import { useSelector } from 'react-redux'
 import { useOutletContext } from 'react-router-dom'
@@ -29,6 +30,12 @@ const CardPlayedCurrentComponent = (card) => {
             agileRow: null,
         })
     }
+
+    const [cardAbilites, setCardAbilites] = useState(null)
+    useEffect(() => {
+        const arr = card?.card?.ability?.split(' ')
+        setCardAbilites(arr)
+    }, [card])
 
     return (
         <div
@@ -91,24 +98,35 @@ const CardPlayedCurrentComponent = (card) => {
             )}
 
             {/* display ability icon if exists */}
-            {card?.card?.ability && (
+            {cardAbilites?.map((item, index) => (
+                <div
+                    key={index}
+                    className="card-ability-box"
+                    style={{
+                        backgroundImage: `url("/icons/card_ability_${item}.png")`,
+                    }}
+                ></div>
+            ))}
+
+            {/* display ability icon if exists */}
+            {/* {card?.card?.ability && (
                 <div
                     className="card-ability-box"
                     style={{
                         backgroundImage: `url("/icons/card_ability_${card?.card?.ability}.png")`,
                     }}
                 ></div>
-            )}
+            )} */}
 
             {/* display spy if hero spy */}
-            {card?.card?.ability === 'hero spy' && (
+            {/* {card?.card?.ability === 'hero spy' && (
                 <div
                     className="card-ability-box"
                     style={{
                         backgroundImage: `url("/icons/card_ability_spy.png")`,
                     }}
                 ></div>
-            )}
+            )} */}
         </div>
     )
 }

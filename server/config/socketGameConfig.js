@@ -240,12 +240,12 @@ const handleGameCardPlay = async (
 
     // CHECK IF CARD IS A SCORCH
     if (
-        cardSelected?.ability === 'scorch' &&
+        cardSelected?.ability.includes('scorch') &&
         gameInfoEditOpp.player_cards_board[0].board_row_points >= 10
     ) {
         let strongestCard = { strength: -1 }
         gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
-            if (item.ability !== 'hero') {
+            if (!item.ability.includes('hero')) {
                 strongestCard =
                     item?.strength > strongestCard?.strength
                         ? item
@@ -265,7 +265,7 @@ const handleGameCardPlay = async (
     }
 
     // CHECK IF CARD IS A DECOY
-    if (cardSelected?.ability === 'decoy') {
+    if (cardSelected?.ability.includes('decoy')) {
         const cardToSwap = cardSelected?.cardToSwap?.card
         delete cardSelected.cardToSwap
 
@@ -289,7 +289,7 @@ const handleGameCardPlay = async (
 
     // CHECK IF CARD IS A MEDIC
     let isMedic = false
-    if (cardSelected?.ability === 'medic') {
+    if (cardSelected?.ability.includes('medic')) {
         isMedic = true
     }
 
@@ -304,7 +304,7 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_to_retrieve = updatedArray
 
         // IF CARD TO RETREIVE BY MEDIC IS NOT A SPY
-        if (isMedic && cardSelected?.cardToRetrieve?.ability !== 'spy') {
+        if (isMedic && !cardSelected?.cardToRetrieve?.ability.includes('spy')) {
             gameInfoEdit.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
                     row.board_row_cards.push(cardSelected?.cardToRetrieve)
@@ -319,7 +319,7 @@ const handleGameCardPlay = async (
         }
 
         // IF CARD TO RETREIVE BY MEDIC IS A SPY
-        if (isMedic && cardSelected?.cardToRetrieve?.ability === 'spy') {
+        if (isMedic && cardSelected?.cardToRetrieve?.ability.includes('spy')) {
             // ADD THE SPY CARD TO THE OPP'S BOARD
             gameInfoEditOpp.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
@@ -354,10 +354,7 @@ const handleGameCardPlay = async (
 
     // CHECK IF CARD IS A SPY
     isSpy = false
-    if (
-        cardSelected?.ability === 'spy' ||
-        cardSelected?.ability === 'hero spy'
-    ) {
+    if (cardSelected?.ability.includes('spy')) {
         isSpy = true
     }
 
@@ -488,11 +485,11 @@ const handleGameCardPlay = async (
         if (item.ability === 'frost') {
             // change strength of the row's cards
             gameInfoEdit.player_cards_board[0].board_row_cards.map((item) => {
-                if (item.ability !== 'hero') item.strengthWeather = 1
+                if (!item.ability.includes('hero')) item.strengthWeather = 1
             })
             gameInfoEditOpp.player_cards_board[0].board_row_cards.map(
                 (item) => {
-                    if (item.ability !== 'hero') item.strengthWeather = 1
+                    if (!item.ability.includes('hero')) item.strengthWeather = 1
                 }
             )
         }
@@ -500,11 +497,11 @@ const handleGameCardPlay = async (
         // ranged
         if (item.ability === 'fog') {
             gameInfoEdit.player_cards_board[1].board_row_cards.map((item) => {
-                if (item.ability !== 'hero') item.strengthWeather = 1
+                if (!item.ability.includes('hero')) item.strengthWeather = 1
             })
             gameInfoEditOpp.player_cards_board[1].board_row_cards.map(
                 (item) => {
-                    if (item.ability !== 'hero') item.strengthWeather = 1
+                    if (!item.ability.includes('hero')) item.strengthWeather = 1
                 }
             )
         }
@@ -512,11 +509,11 @@ const handleGameCardPlay = async (
         // siege
         if (item.ability === 'rain') {
             gameInfoEdit.player_cards_board[2].board_row_cards.map((item) => {
-                if (item.ability !== 'hero') item.strengthWeather = 1
+                if (!item.ability.includes('hero')) item.strengthWeather = 1
             })
             gameInfoEditOpp.player_cards_board[2].board_row_cards.map(
                 (item) => {
-                    if (item.ability !== 'hero') item.strengthWeather = 1
+                    if (!item.ability.includes('hero')) item.strengthWeather = 1
                 }
             )
         }

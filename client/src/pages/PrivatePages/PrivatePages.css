@@ -211,6 +211,7 @@
     border: 1px solid lightblue;
     text-align: center;
     margin: auto;
+    margin-right: 4px;
     font-size: 30px;
 }
 .row-special-card-box {

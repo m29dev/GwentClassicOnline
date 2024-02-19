@@ -45,11 +45,16 @@ const GameComponent = () => {
             return console.log('select right row')
         }
 
-        if (cardSelected?.ability === 'medic') {
+        if (cardSelected?.ability.includes('medic')) {
             console.log('CARD IS A MEDIC')
 
-            setDisplayCardsToRetrieve(true)
-            return
+            if (
+                gameInfo?.gamePlayerCurrent?.player_cards_to_retrieve?.length >
+                0
+            ) {
+                setDisplayCardsToRetrieve(true)
+                return
+            }
         }
 
         if (cardSelected?.ability === 'spy') {
