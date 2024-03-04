@@ -21,18 +21,20 @@ const handleCardMoraleService = (playerObject) => {
         row.board_row_cards.map((item) => {
             if (item.ability === 'special') return
 
-            let itemDefaultStrength = 0
-            cards.forEach((defaultCard) => {
-                if (defaultCard.id === item.id) {
-                    itemDefaultStrength = defaultCard.strength
-                }
-            })
-            console.log(1, itemDefaultStrength)
+            // let itemDefaultStrength = 0
+            // cards.forEach((defaultCard) => {
+            //     if (defaultCard.id === item.id) {
+            //         itemDefaultStrength = +defaultCard.strength
+            //     }
+            // })
+            // console.log(1, itemDefaultStrength)
 
             if (item.ability === 'morale') {
-                item.strength = +itemDefaultStrength + morale.length - 1
+                if (morale.length > 1) {
+                    item.strengthMorale = +item.strength + +(morale.length - 1)
+                }
             } else {
-                item.strength = +itemDefaultStrength + morale.length
+                item.strengthMorale = +item.strength + +morale.length
             }
         })
     })
@@ -42,6 +44,33 @@ const handleCardMoraleService = (playerObject) => {
     return editPlayerObejct
 }
 
+const handleCardCommanderService = (playerObject) => {
+    console.log(1, 'check for COMMANDERS CARDS')
+
+    const editPlayerObejct = playerObject
+
+    // for each row look for commander card ability
+    editPlayerObejct.player_cards_board.map((row) => {
+        if (row?.board_row_card_special?.ability?.includes('horn')) {
+            console.log(
+                'detected special card: ',
+                row?.board_row_card_special,
+                'for: ',
+                row
+            )
+
+            row.board_row_cards.map((item) => {
+                if (!item?.ability?.includes('hero')) {
+                    item.strengthCommander = +item.strength + +item.strength
+                }
+            })
+        }
+    })
+
+    return editPlayerObejct
+}
+
 module.exports = {
     handleCardMoraleService,
+    handleCardCommanderService,
 }

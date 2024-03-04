@@ -86,7 +86,7 @@
 .left-box,
 .right-box {
     width: 40%;
-    height: calc(100vh - 210px);
+    height: calc(100vh - 230px);
     border: 1px solid lightskyblue;
     padding: 0px 20px;
 
@@ -122,6 +122,7 @@
 }
 
 .faction-info {
+    margin-top: 20px;
     text-align: center;
 }
 .faction-info p {

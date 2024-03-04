@@ -71,6 +71,7 @@ import {
     createRoutesFromElements,
     RouterProvider,
     Route,
+    Navigate,
 } from 'react-router-dom'
 import { store } from './redux/store'
 import { Provider } from 'react-redux'
@@ -84,11 +85,12 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             {/* public routes */}
+            <Route path="/" element={<Navigate to="/home" replace={true} />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
             {/* <Route path="/signup" element={SignUpPage}></Route> */}
 
             {/* private routes */}
-            <Route path="/home" element={<HomePage />} />
             <Route path="/rooms" element={<RoomsPage />} />
             <Route path="/rooms/:id" element={<RoomsIdPage />} />
             {/* <Route path="/game" element={<GamePage />} /> */}

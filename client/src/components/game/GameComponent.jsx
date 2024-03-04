@@ -30,9 +30,20 @@ const GameComponent = () => {
             return console.log('cannot play now')
         }
 
-        if (cardSelected?.row !== 'agile' && _row !== cardSelected?.row) {
+        // if (
+        //     cardSelected?.row !== 'agile' &&
+        //     !_row?.includes?.cardSelected?.row
+        // ) {
+        //     // check if cardSelected's row is equal to clicked row
+        //     return console.log('select right row, seleced row: ', _row)
+        // }
+
+        if (
+            cardSelected?.row !== 'agile' &&
+            !_row?.includes(cardSelected?.row)
+        ) {
             // check if cardSelected's row is equal to clicked row
-            return console.log('select right row')
+            return console.log('select right row, seleced row: ', _row)
         }
 
         // check if cardSelected is a weather card
@@ -59,6 +70,10 @@ const GameComponent = () => {
 
         if (cardSelected?.ability === 'spy') {
             console.log('CARD IS A SPY')
+        }
+
+        if (cardSelected?.row === 'special') {
+            cardSelected.row = `${_row}`
         }
 
         // if card is agile
@@ -277,7 +292,19 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[2]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div className="row-special-card-box">
+                            {gameInfo?.gamePlayerOpponent
+                                ?.player_cards_board?.[2]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerOpponent
+                                            ?.player_cards_board?.[2]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
@@ -313,7 +340,19 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[1]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div className="row-special-card-box">
+                            {gameInfo?.gamePlayerOpponent
+                                ?.player_cards_board?.[1]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerOpponent
+                                            ?.player_cards_board?.[1]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
@@ -349,7 +388,19 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[0]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div className="row-special-card-box">
+                            {gameInfo?.gamePlayerOpponent
+                                ?.player_cards_board?.[0]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerOpponent
+                                            ?.player_cards_board?.[0]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
@@ -388,7 +439,27 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[0]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div
+                            className={
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'special'
+                                    ? 'row-special-card-box row-common-active'
+                                    : 'row-special-card-box'
+                            }
+                            onClick={() => handlePlayCard('close special')}
+                        >
+                            {gameInfo?.gamePlayerCurrent
+                                ?.player_cards_board?.[0]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerCurrent
+                                            ?.player_cards_board?.[0]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
@@ -430,7 +501,27 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[1]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div
+                            className={
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'special'
+                                    ? 'row-special-card-box row-common-active'
+                                    : 'row-special-card-box'
+                            }
+                            onClick={() => handlePlayCard('ranged special')}
+                        >
+                            {gameInfo?.gamePlayerCurrent
+                                ?.player_cards_board?.[1]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerCurrent
+                                            ?.player_cards_board?.[1]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent
@@ -472,7 +563,27 @@ const GameComponent = () => {
                                     ?.player_cards_board?.[2]?.board_row_points
                             }
                         </div>
-                        <div className="row-special-card-box"></div>
+                        <div
+                            className={
+                                gameInfo?.gamePlayerCurrent
+                                    ?.player_card_selected?.row === 'special'
+                                    ? 'row-special-card-box row-common-active'
+                                    : 'row-special-card-box'
+                            }
+                            onClick={() => handlePlayCard('siege special')}
+                        >
+                            {gameInfo?.gamePlayerCurrent
+                                ?.player_cards_board?.[2]
+                                ?.board_row_card_special && (
+                                <CardPlayedComponent
+                                    card={
+                                        gameInfo?.gamePlayerCurrent
+                                            ?.player_cards_board?.[2]
+                                            ?.board_row_card_special
+                                    }
+                                ></CardPlayedComponent>
+                            )}
+                        </div>
                         <div
                             className={
                                 gameInfo?.gamePlayerCurrent

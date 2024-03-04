@@ -1,6 +1,14 @@
 const { getFaction } = require('./factionConfig')
 const Game = require('../models/Game')
-const { handleCardMoraleService } = require('../services/cardAbilityService')
+const {
+    handleCardMoraleService,
+    handleCardCommanderService,
+} = require('../services/cardAbilityService')
+const { abilityBond } = require('../services/abilityBondService')
+const {
+    handleCardStrength,
+    handlePlayerRowAndGlobalStrength,
+} = require('../services/cardStrengthService')
 
 const handleGameInitFaction = async (
     socket,
@@ -101,9 +109,21 @@ const handleGameInitFaction = async (
         // variable info, clear each round
         player_cards_board: [
             // cards played for each row on the board
-            { board_row: 'close', board_row_cards: [] },
-            { board_row: 'ranged', board_row_cards: [] },
-            { board_row: 'siege', board_row_cards: [] },
+            {
+                board_row: 'close',
+                board_row_cards: [],
+                board_row_card_special: null,
+            },
+            {
+                board_row: 'ranged',
+                board_row_cards: [],
+                board_row_card_special: null,
+            },
+            {
+                board_row: 'siege',
+                board_row_cards: [],
+                board_row_card_special: null,
+            },
         ],
     }
 
@@ -239,29 +259,81 @@ const handleGameCardPlay = async (
     }
 
     // CHECK IF CARD IS A SCORCH
-    if (
-        cardSelected?.ability.includes('scorch') &&
-        gameInfoEditOpp.player_cards_board[0].board_row_points >= 10
-    ) {
-        let strongestCard = { strength: -1 }
-        gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
-            if (!item.ability.includes('hero')) {
-                strongestCard =
-                    item?.strength > strongestCard?.strength
-                        ? item
-                        : strongestCard
-            }
+    if (cardSelected?.ability?.includes('scorch')) {
+        let strongestCard = { strengthToCompare: -1 }
+
+        console.log(111111, 'SCORCH CARD PLAYED')
+
+        // ! update later to search for ANY strongest cards  not only opponents cards
+
+        // gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
+        //     if (!item.ability.includes('hero')) {
+        //         strongestCard =
+        //             item?.strength > strongestCard?.strength
+        //                 ? item
+        //                 : strongestCard
+        //     }
+        // })
+
+        gameInfoEditOpp.player_cards_board.map((row) => {
+            row.board_row_cards.map((item) => {
+                if (!item.ability.includes('hero')) {
+                    // if item has strengthBond
+                    if (item?.strengthBond) {
+                        if (
+                            item?.strengthBond >
+                            strongestCard?.strengthToCompare
+                        ) {
+                            strongestCard = item
+                            strongestCard.strengthToCompare = item.strengthBond
+                        }
+                    }
+
+                    // if item has default strength only
+                    if (!item?.strengthBond) {
+                        if (item?.strength > strongestCard?.strengthToCompare) {
+                            strongestCard = item
+                            strongestCard.strengthToCompare = item.strength
+                        }
+                    }
+                }
+            })
         })
+
+        console.log(111111, 'THE STRONGEST: ', strongestCard)
 
         const updatedArray = []
-        gameInfoEditOpp.player_cards_board[0].board_row_cards.map((item) => {
-            if (item.id !== strongestCard.id) {
+        const cardsToRetrieve = []
+        gameInfoEditOpp.player_cards_board[
+            strongestCard?.row === 'close'
+                ? 0
+                : strongestCard?.row === 'ranged'
+                ? 1
+                : 2
+        ].board_row_cards.map((item) => {
+            if (item.name !== strongestCard.name) {
                 updatedArray.push(item)
+            } else {
+                delete item.strengthBond
+                delete item.strengthWeather
+                delete item.strengthMorale
+                cardsToRetrieve.push(item)
             }
         })
 
-        gameInfoEditOpp.player_cards_board[0].board_row_cards = updatedArray
-        gameInfoEditOpp.player_cards_to_retrieve.push(strongestCard)
+        console.log(111111, 'cardsToRetrieve: ', cardsToRetrieve)
+
+        gameInfoEditOpp.player_cards_board[
+            strongestCard?.row === 'close'
+                ? 0
+                : strongestCard?.row === 'ranged'
+                ? 1
+                : 2
+        ].board_row_cards = updatedArray
+        if (!gameInfoEditOpp.player_cards_to_retrieve) {
+            gameInfoEditOpp.player_cards_to_retrieve = []
+        }
+        gameInfoEditOpp.player_cards_to_retrieve.push(...cardsToRetrieve)
     }
 
     // CHECK IF CARD IS A DECOY
@@ -284,6 +356,16 @@ const handleGameCardPlay = async (
             }
         })
 
+        if (cardToSwap?.ability.includes('bond')) {
+            gameInfoEdit = abilityBond(gameInfoEdit, cardToSwap)
+        }
+
+        // remove all additional strength
+        delete cardToSwap?.strengthBond
+        delete cardToSwap?.strengthWeather
+        delete cardToSwap?.strengthMorale
+        delete cardToSwap?.strengthEffect
+
         gameInfoEdit.player_cards_current.push(cardToSwap)
     }
 
@@ -304,7 +386,7 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_to_retrieve = updatedArray
 
         // IF CARD TO RETREIVE BY MEDIC IS NOT A SPY
-        if (isMedic && !cardSelected?.cardToRetrieve?.ability.includes('spy')) {
+        if (!cardSelected?.cardToRetrieve?.ability.includes('spy')) {
             gameInfoEdit.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
                     row.board_row_cards.push(cardSelected?.cardToRetrieve)
@@ -316,10 +398,19 @@ const handleGameCardPlay = async (
                         : +cardSelected?.cardToRetrieve?.strength
                 }
             })
+
+            if (cardSelected?.cardToRetrieve?.ability.includes('bond')) {
+                console.log(374000, 'CARD TO RETRIEVE IS A BOND ABILITY CARD')
+
+                gameInfoEdit = abilityBond(
+                    gameInfoEdit,
+                    cardSelected?.cardToRetrieve
+                )
+            }
         }
 
         // IF CARD TO RETREIVE BY MEDIC IS A SPY
-        if (isMedic && cardSelected?.cardToRetrieve?.ability.includes('spy')) {
+        if (cardSelected?.cardToRetrieve?.ability.includes('spy')) {
             // ADD THE SPY CARD TO THE OPP'S BOARD
             gameInfoEditOpp.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.cardToRetrieve?.row) {
@@ -358,9 +449,19 @@ const handleGameCardPlay = async (
         isSpy = true
     }
 
-    // ADD PLAYED CARD TO THE BOARD ARRAY
-    // NOT A SPY
-    if (!isSpy && !isWeather) {
+    // CHECK IF CARD IS SPECIAL ROW CARD
+
+    if (cardSelected?.row?.includes('special')) {
+        gameInfoEdit.player_cards_board.map((row) => {
+            if (cardSelected?.row?.includes(row?.board_row)) {
+                row.board_row_card_special = cardSelected
+            }
+        })
+    }
+
+    if (!isSpy && !isWeather && cardSelected?.ability !== 'scorch') {
+        // ADD PLAYED CARD TO THE BOARD ARRAY
+        // NOT A SPY
         if (!agile) {
             gameInfoEdit.player_cards_board.map((row) => {
                 if (row?.board_row === cardSelected?.row) {
@@ -424,116 +525,83 @@ const handleGameCardPlay = async (
             : +cardSelected?.strength
     }
 
-    // CHECK FOR THE BOND ABILITY CARDS
-    if (cardSelected.ability === 'bond') {
-        console.log(244, 'cardSelected ability BOND detected')
-        const bondArray = []
+    // // CHECK FOR THE BOND ABILITY CARDS
+    // if (cardSelected.ability === 'bond') {
+    //     console.log(244, 'cardSelected ability BOND detected')
 
-        // first check how many bond cards with same type are in game
-        gameInfoEdit.player_cards_board[
-            cardSelected.row === 'close'
-                ? 0
-                : cardSelected.row === 'ranged'
-                ? 1
-                : 2
-        ].board_row_cards.map((card) => {
-            if (card.name === cardSelected.name) bondArray.push(card)
-            console.log(253, card.id)
-        })
+    //     gameInfoEdit = abilityBond(gameInfoEdit, cardSelected)
+    // }
 
-        // second update bond cards strength (depends on how many bond cards are in game)
-        gameInfoEdit.player_cards_board[
-            cardSelected.row === 'close'
-                ? 0
-                : cardSelected.row === 'ranged'
-                ? 1
-                : 2
-        ].board_row_cards.map((card) => {
-            if (card.name === cardSelected.name) {
-                card.strength =
-                    +cardSelected.strength +
-                    cardSelected.strength * (bondArray.length - 1)
+    // // calc strength if any morale cards detected
+    // const updatedGameInfoEditMorale = handleCardMoraleService(gameInfoEdit)
+    // gameInfoEdit = updatedGameInfoEditMorale
 
-                console.log(
-                    271,
-                    'updated strength of card with id ',
-                    card.id,
-                    'is: ',
-                    card.strength
-                )
-            }
-        })
-
-        // row.board_row_cards.map((card) => {
-        //     const bondArray = [cardSelected]
-        //     if (card.name === cardSelected) {
-        //         bondArray.push(card)
-        //     }
-        // })
-    }
-
-    // calc strength if any morale cards detected
-    const updatedGameInfoEdit = handleCardMoraleService(gameInfoEdit)
-    gameInfoEdit = updatedGameInfoEdit
+    // // calc strength if any commanders cards detected
+    // const updatedGameInfoEditCommander =
+    //     handleCardCommanderService(gameInfoEdit)
+    // gameInfoEdit = updatedGameInfoEditCommander
 
     // REMOVE CARD SELECTED AFTER THE PLAY
     gameInfoEdit.player_card_selected = {}
 
-    // CHECK ALL WEATHER CARDS (WILL BE NEEDED IN CALCULATION OF THE CARD'S STRENGTH)
-    game.gamePlayerBoth.weather_row_cards.map((item) => {
-        // close
-        if (item.ability === 'frost') {
-            // change strength of the row's cards
-            gameInfoEdit.player_cards_board[0].board_row_cards.map((item) => {
-                if (!item.ability.includes('hero')) item.strengthWeather = 1
-            })
-            gameInfoEditOpp.player_cards_board[0].board_row_cards.map(
-                (item) => {
-                    if (!item.ability.includes('hero')) item.strengthWeather = 1
-                }
-            )
-        }
+    // // CHECK ALL WEATHER CARDS (WILL BE NEEDED IN CALCULATION OF THE CARD'S STRENGTH)
+    // game.gamePlayerBoth.weather_row_cards.map((item) => {
+    //     // close
+    //     if (item.ability === 'frost') {
+    //         // change strength of the row's cards
+    //         gameInfoEdit.player_cards_board[0].board_row_cards.map((item) => {
+    //             if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //         })
+    //         gameInfoEditOpp.player_cards_board[0].board_row_cards.map(
+    //             (item) => {
+    //                 if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //             }
+    //         )
+    //     }
 
-        // ranged
-        if (item.ability === 'fog') {
-            gameInfoEdit.player_cards_board[1].board_row_cards.map((item) => {
-                if (!item.ability.includes('hero')) item.strengthWeather = 1
-            })
-            gameInfoEditOpp.player_cards_board[1].board_row_cards.map(
-                (item) => {
-                    if (!item.ability.includes('hero')) item.strengthWeather = 1
-                }
-            )
-        }
+    //     // ranged
+    //     if (item.ability === 'fog') {
+    //         gameInfoEdit.player_cards_board[1].board_row_cards.map((item) => {
+    //             if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //         })
+    //         gameInfoEditOpp.player_cards_board[1].board_row_cards.map(
+    //             (item) => {
+    //                 if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //             }
+    //         )
+    //     }
 
-        // siege
-        if (item.ability === 'rain') {
-            gameInfoEdit.player_cards_board[2].board_row_cards.map((item) => {
-                if (!item.ability.includes('hero')) item.strengthWeather = 1
-            })
-            gameInfoEditOpp.player_cards_board[2].board_row_cards.map(
-                (item) => {
-                    if (!item.ability.includes('hero')) item.strengthWeather = 1
-                }
-            )
-        }
+    //     // siege
+    //     if (item.ability === 'rain') {
+    //         gameInfoEdit.player_cards_board[2].board_row_cards.map((item) => {
+    //             if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //         })
+    //         gameInfoEditOpp.player_cards_board[2].board_row_cards.map(
+    //             (item) => {
+    //                 if (!item.ability.includes('hero')) item.strengthWeather = 1
+    //             }
+    //         )
+    //     }
 
-        // CLEAR WEATHER
-        if (item.ability === 'clear') {
-            console.log('strengthWeather CLEARED')
+    //     // CLEAR WEATHER
+    //     if (item.ability === 'clear') {
+    //         console.log('strengthWeather CLEARED')
 
-            gameInfoEdit.player_cards_board.map((row) => {
-                row.board_row_cards.map((item) => {
-                    delete item.strengthWeather
-                })
-            })
-            gameInfoEditOpp.player_cards_board.map((row) => {
-                row.board_row_cards.map((item) => {
-                    delete item.strengthWeather
-                })
-            })
-        }
-    })
+    //         gameInfoEdit.player_cards_board.map((row) => {
+    //             row.board_row_cards.map((item) => {
+    //                 delete item.strengthWeather
+    //             })
+    //         })
+    //         gameInfoEditOpp.player_cards_board.map((row) => {
+    //             row.board_row_cards.map((item) => {
+    //                 delete item.strengthWeather
+    //             })
+    //         })
+    //     }
+    // })
+
+    gameInfoEdit = handleCardStrength(gameInfoEdit, game?.gamePlayerBoth)
+    gameInfoEditOpp = handleCardStrength(gameInfoEditOpp, game?.gamePlayerBoth)
 
     // sort by the cards strength
     const compareStrength = (a, b) => {
@@ -544,51 +612,60 @@ const handleGameCardPlay = async (
 
     // CALCULATE STRENGTH POINTS:
     // 1. ROW STRENGTH POINTS
-    let globalStrength = 0
-    gameInfoEdit.player_cards_board.map((row) => {
-        let rowStrength = 0
-        row.board_row_cards.map((item) => {
-            if (item.strengthWeather) {
-                rowStrength = +rowStrength + +1
-            } else {
-                rowStrength = +rowStrength + +item.strength
-            }
-        })
+    // let globalStrength = 0
+    // gameInfoEdit.player_cards_board.map((row) => {
+    //     let rowStrength = 0
 
-        row.board_row_points = +rowStrength
-        globalStrength = +globalStrength + +rowStrength
+    //     row.board_row_cards.map((item) => {
+    //         if (item.strengthWeather) {
+    //             rowStrength = +rowStrength + +1
+    //         } else if (item.strengthBond) {
+    //             rowStrength = +rowStrength + +item.strengthBond
+    //         } else {
+    //             rowStrength = +rowStrength + +item.strength
+    //         }
+    //     })
 
-        // sort by the cards strength
-        const compareStrength = (a, b) => {
-            return a.strength - b.strength
-        }
-        row.board_row_cards.sort(compareStrength)
-    })
+    //     row.board_row_points = +rowStrength
+    //     globalStrength = +globalStrength + +rowStrength
 
-    let globalStrengthOpp = 0
-    gameInfoEditOpp.player_cards_board.map((row) => {
-        let rowStrength = 0
-        row.board_row_cards.map((item) => {
-            if (item.strengthWeather) {
-                rowStrength = +rowStrength + +1
-            } else {
-                rowStrength = +rowStrength + +item.strength
-            }
-        })
+    //     // sort by the cards strength
+    //     const compareStrength = (a, b) => {
+    //         return a.strength - b.strength
+    //     }
+    //     row.board_row_cards.sort(compareStrength)
+    // })
 
-        row.board_row_points = +rowStrength
-        globalStrengthOpp = +globalStrengthOpp + +rowStrength
+    // let globalStrengthOpp = 0
+    // gameInfoEditOpp.player_cards_board.map((row) => {
+    //     let rowStrength = 0
+    //     row.board_row_cards.map((item) => {
+    //         if (item.strengthWeather) {
+    //             rowStrength = +rowStrength + +1
+    //         } else if (item.strengthBond) {
+    //             rowStrength = +rowStrength + +item.strengthBond
+    //         } else {
+    //             rowStrength = +rowStrength + +item.strength
+    //         }
+    //     })
 
-        // sort by the cards strength
-        const compareStrength = (a, b) => {
-            return a.strength - b.strength
-        }
-        row.board_row_cards.sort(compareStrength)
-    })
+    //     row.board_row_points = +rowStrength
+    //     globalStrengthOpp = +globalStrengthOpp + +rowStrength
 
-    // 2. GLOBAL STRENGTH POINTS
-    gameInfoEdit.player_points = +globalStrength
-    gameInfoEditOpp.player_points = +globalStrengthOpp
+    //     // sort by the cards strength
+    //     const compareStrength = (a, b) => {
+    //         return a.strength - b.strength
+    //     }
+    //     row.board_row_cards.sort(compareStrength)
+    // })
+
+    // // 2. ROW AND GLOBAL STRENGTH POINTS
+    // gameInfoEdit.player_points = +globalStrength
+    // gameInfoEditOpp.player_points = +globalStrengthOpp
+
+    // ROW AND GLOBAL STRENGTH
+    gameInfoEdit = handlePlayerRowAndGlobalStrength(gameInfoEdit)
+    gameInfoEditOpp = handlePlayerRowAndGlobalStrength(gameInfoEditOpp)
 
     // CHECK IF ALL CARD BEEN PLAYED
     if (gameInfoEdit.player_cards_current.length === 0) {

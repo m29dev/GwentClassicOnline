@@ -30,11 +30,55 @@ const CardPlayedComponent = (card) => {
                         backgroundImage: `url("/icons/power_normal_icon.png")`,
                     }}
                 >
-                    <div className="card-power">
-                        {card?.card?.strengthWeather
-                            ? card?.card?.strengthWeather
-                            : card?.card?.strength}
-                    </div>
+                    {/* standard strengthEffect */}
+                    {card?.card?.strengthEffect && (
+                        <div
+                            className={
+                                +card?.card?.strengthEffect ===
+                                +card?.card?.strength
+                                    ? 'card-power'
+                                    : +card?.card?.strengthEffect >
+                                      +card?.card?.strength
+                                    ? 'card-power card-power-effect'
+                                    : 'card-power card-power-weather'
+                            }
+                        >
+                            {card?.card?.strengthEffect}
+                        </div>
+                    )}
+
+                    {/* standard strength */}
+                    {/* {!card?.card?.strengthBond &&
+                        !card?.card?.strengthWeather &&
+                        !card?.card?.strengthMorale && (
+                            <div className="card-power">
+                                {card?.card?.strength}
+                            </div>
+                        )} */}
+
+                    {/* weather strength */}
+                    {/* {card?.card?.strengthWeather && (
+                        <div className="card-power">
+                            {card?.card?.strengthWeather}
+                        </div>
+                    )} */}
+
+                    {/* bond strength */}
+                    {/* {card?.card?.strengthBond &&
+                        !card?.card?.strengthWeather && (
+                            <div className="card-power bond-strength">
+                                {card?.card?.strengthBond}
+                            </div>
+                        )} */}
+
+                    {/* morale strength */}
+                    {/* {card?.card?.strengthMorale &&
+                        !card?.card?.strengthBond &&
+                        !card?.card?.strengthWeather && (
+                            <div className="card-power morale-strength">
+                                {card?.card?.strengthMorale}
+                            </div>
+                        )} */}
                 </div>
             )}
 

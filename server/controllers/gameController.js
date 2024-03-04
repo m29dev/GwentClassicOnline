@@ -207,6 +207,8 @@ const game_factions = async (req, res) => {
                 }
             })
 
+            factionObject.leaderDeck = factionObject.leadersCollection[0]
+
             factionsInfo.factions.push(factionObject)
         })
 

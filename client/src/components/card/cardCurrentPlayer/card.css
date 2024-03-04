@@ -73,6 +73,19 @@
     text-align: center;
     color: black;
 }
+/* .bond-strength {
+    color: green;
+} */
+/* .morale-strength {
+    color: rgb(118, 221, 0);
+} */
+
+.card-power-effect {
+    color: green;
+}
+.card-power-weather {
+    color: rgb(255, 86, 35);
+}
 
 .card-power-hero-box {
     width: 60px;

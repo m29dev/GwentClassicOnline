@@ -60,7 +60,8 @@ const RoomsPage = () => {
                 />
                 <Button
                     variant="dark"
-                    className="form-container-btn"
+                    className="form-container-btn btn-universal"
+                    disabled={room ? false : true}
                     onClick={handleJoinRoom}
                 >
                     Join room
@@ -89,7 +90,7 @@ const RoomsPage = () => {
                 <Button
                     variant="dark"
                     disabled={roomName ? false : true}
-                    className="form-container-btn"
+                    className="form-container-btn btn-universal"
                     onClick={(e) => {
                         e.preventDefault()
                         onRoomCreate()
