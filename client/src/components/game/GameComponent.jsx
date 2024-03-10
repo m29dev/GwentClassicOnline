@@ -30,26 +30,14 @@ const GameComponent = () => {
             return console.log('cannot play now')
         }
 
-        // if (
-        //     cardSelected?.row !== 'agile' &&
-        //     !_row?.includes?.cardSelected?.row
-        // ) {
-        //     // check if cardSelected's row is equal to clicked row
-        //     return console.log('select right row, seleced row: ', _row)
-        // }
-
         if (
             cardSelected?.row !== 'agile' &&
+            !cardSelected?.row !== 'leader' &&
             !_row?.includes(cardSelected?.row)
         ) {
             // check if cardSelected's row is equal to clicked row
             return console.log('select right row, seleced row: ', _row)
         }
-
-        // check if cardSelected is a weather card
-        // if (cardSelected?.row === 'weather') {
-        //     return console.log('WEATHER CARD SELECTED')
-        // }
 
         // check if cardSelected's row is agile and row is not siege
         if (cardSelected?.row === 'agile' && _row === 'siege') {
@@ -132,6 +120,24 @@ const GameComponent = () => {
 
         console.log('FETCHING GAME DATA ON INIT...', res)
     }, [getGameId, roomInfo, userInfo, dispatch])
+
+    const [displayUseLeaderAbility, setDisplayUseLeaderAbility] =
+        useState(false)
+
+    useEffect(() => {
+        if (
+            gameInfo?.gamePlayerCurrent?.player_card_selected?.row?.includes(
+                'leader'
+            ) &&
+            !gameInfo?.gamePlayerCurrent?.player_card_selected?.cardUsed
+        ) {
+            console.log(
+                'LEADER CARD SELECTED: ',
+                gameInfo?.player_card_selected
+            )
+            setDisplayUseLeaderAbility(true)
+        }
+    }, [gameInfo])
 
     // on init fetch gameInfo data from database
     useEffect(() => {
@@ -645,6 +651,26 @@ const GameComponent = () => {
             <div className="right-side">
                 {/* DISPLAY CARD DETAILS ON CARD CLICK */}
                 <CardDetailsComponent></CardDetailsComponent>
+
+                {/* LEADER CARD POPUP */}
+                {displayUseLeaderAbility && (
+                    <div className="leader-ability-absolute center-box-absolute-leaders">
+                        Do You want to use leaders ability?
+                        <button
+                            onClick={() => {
+                                setDisplayUseLeaderAbility(false)
+                                handlePlayCard('leader')
+                            }}
+                        >
+                            YES
+                        </button>
+                        <button
+                            onClick={() => setDisplayUseLeaderAbility(false)}
+                        >
+                            NO
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* ABSOLUTE POSITIONED INFO (PLAYER TURN, GAME UPDATES) */}

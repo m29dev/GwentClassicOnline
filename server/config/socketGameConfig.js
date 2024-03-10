@@ -259,8 +259,168 @@ const handleGameCardPlay = async (
         // })
     }
 
-    // CHECK IF CARD IS A SCORCH
+    // CHECK IF CARD IS A LEADER
+    if (cardSelected?.row?.includes('leader')) {
+        const ability = cardSelected?.ability
+
+        gameInfoEdit.player_leader.cardUsed = true
+
+        console.log('265            LEADER CARD:', ability)
+
+        // use leader's ability
+        if (ability?.includes('foltest_king')) {
+            // play fog card
+            // search for fog card in the deck / current cards
+            isFog = false
+
+            const updateCurrentCards = []
+            if (!isFog) {
+                gameInfoEdit?.player_cards_current?.map((item) => {
+                    if (item?.ability?.includes('fog')) {
+                        isFog = true
+                        game?.gamePlayerBoth?.weather_row_cards?.push(item)
+                    } else {
+                        updateCurrentCards.push(item)
+                    }
+                })
+
+                gameInfoEdit.player_cards_current = updateCurrentCards
+            }
+
+            const updateDeckCards = []
+            if (!isFog) {
+                gameInfoEdit?.player_cards_not_played?.map((item) => {
+                    if (item?.ability?.includes('fog')) {
+                        isFog = true
+                        game?.gamePlayerBoth?.weather_row_cards?.push(item)
+                    } else {
+                        updateDeckCards.push(item)
+                    }
+                })
+
+                gameInfoEdit.player_cards_not_played = updateDeckCards
+            }
+        }
+
+        if (ability?.includes('foltest_lord')) {
+            // play clear weather card
+            isClear = false
+
+            const updateCurrentCards = []
+            if (!isClear) {
+                gameInfoEdit?.player_cards_current?.map((item) => {
+                    if (item?.ability?.includes('clear')) {
+                        isClear = true
+                        game?.gamePlayerBoth?.weather_row_cards?.push(item)
+                    } else {
+                        updateCurrentCards.push(item)
+                    }
+                })
+
+                gameInfoEdit.player_cards_current = updateCurrentCards
+            }
+
+            const updateDeckCards = []
+            if (!isClear) {
+                gameInfoEdit?.player_cards_not_played?.map((item) => {
+                    if (item?.ability?.includes('clear')) {
+                        isClear = true
+                        game?.gamePlayerBoth?.weather_row_cards?.push(item)
+                    } else {
+                        updateDeckCards.push(item)
+                    }
+                })
+
+                gameInfoEdit.player_cards_not_played = updateDeckCards
+            }
+        }
+
+        if (ability?.includes('foltest_siegemaster')) {
+            // double the Siege row's strength if not horn card
+
+            if (
+                !gameInfoEdit?.player_cards_board?.[2]?.board_row_card_special?.ability?.includes(
+                    'horn'
+                )
+            ) {
+                gameInfoEdit.player_cards_board[2].board_row_card_special = {
+                    name: "Commander's Horn",
+                    id: '20',
+                    deck: 'special',
+                    row: 'special',
+                    strength: '',
+                    ability: 'horn',
+                    filename: 'horn',
+                    count: '3',
+                }
+            }
+        }
+
+        if (ability?.includes('foltest_steelforged')) {
+            // destroy strongest Siege row's card (if strength >= 10)
+            if (
+                gameInfoEditOpp?.player_cards_board?.[2]?.board_row_points >= 10
+            ) {
+                let theStrongest = { strengthEffect: -1 }
+
+                gameInfoEditOpp?.player_cards_board?.[2]?.board_row_cards?.map(
+                    (item) => {
+                        if (
+                            !item?.ability?.includes('hero') &&
+                            item?.strengthEffect > theStrongest?.strengthEffect
+                        ) {
+                            theStrongest = item
+                        }
+                    }
+                )
+
+                const updateRowCards = []
+                gameInfoEditOpp?.player_cards_board?.[2]?.board_row_cards?.map(
+                    (item) => {
+                        if (item?.id !== theStrongest?.id) {
+                            updateRowCards.push(item)
+                        }
+                    }
+                )
+                gameInfoEditOpp.player_cards_board[2].board_row_cards =
+                    updateRowCards
+            }
+        }
+
+        if (ability?.includes('foltest_son')) {
+            // destroy strongest Ranged row's card (if strength >= 10)
+            if (
+                gameInfoEditOpp?.player_cards_board?.[1]?.board_row_points >= 10
+            ) {
+                let theStrongest = { strengthEffect: -1 }
+
+                gameInfoEditOpp?.player_cards_board?.[1]?.board_row_cards?.map(
+                    (item) => {
+                        if (
+                            !item?.ability?.includes('hero') &&
+                            item?.strengthEffect > theStrongest?.strengthEffect
+                        ) {
+                            theStrongest = item
+                        }
+                    }
+                )
+
+                const updateRowCards = []
+                gameInfoEditOpp?.player_cards_board?.[1]?.board_row_cards?.map(
+                    (item) => {
+                        if (item?.id !== theStrongest?.id) {
+                            updateRowCards.push(item)
+                        }
+                    }
+                )
+                gameInfoEditOpp.player_cards_board[1].board_row_cards =
+                    updateRowCards
+            }
+        }
+    }
+
     if (cardSelected?.ability?.includes('scorch')) {
+        // CHECK IF CARD IS A SCORCH
         let strongestCard = { strengthToCompare: -1 }
 
         console.log(111111, 'SCORCH CARD PLAYED')
