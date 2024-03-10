@@ -116,7 +116,10 @@ const handlePlayerRowAndGlobalStrength = (gameInfoEdit) => {
         rowPoints = 0
 
         row.board_row_cards.map((item) => {
-            rowPoints += +item.strengthEffect
+            rowPoints +=
+                +item?.strengthEffect > +item?.strength
+                    ? +item.strengthEffect
+                    : +item.strength
         })
 
         row.board_row_points = +rowPoints

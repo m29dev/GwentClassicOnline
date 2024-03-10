@@ -115,10 +115,7 @@ const CardPlayedCurrentComponent = (card) => {
             )}
 
             {/* display strength hero icon if card has hero ability */}
-            {((card?.card?.strength && card?.card?.ability === 'hero') ||
-                (card?.card?.strength && card?.card?.ability === 'hero spy') ||
-                (card?.card?.strength &&
-                    card?.card?.ability === 'hero medic')) && (
+            {card?.card?.strength && card?.card?.ability.includes('hero') && (
                 <div
                     className="card-power-hero-box"
                     style={{

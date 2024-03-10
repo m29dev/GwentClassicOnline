@@ -9,6 +9,7 @@ const {
     handleCardStrength,
     handlePlayerRowAndGlobalStrength,
 } = require('../services/cardStrengthService')
+const cards = require('./cardsConfig')
 
 const handleGameInitFaction = async (
     socket,
@@ -337,7 +338,7 @@ const handleGameCardPlay = async (
     }
 
     // CHECK IF CARD IS A DECOY
-    if (cardSelected?.ability.includes('decoy')) {
+    if (cardSelected?.ability?.includes('decoy')) {
         const cardToSwap = cardSelected?.cardToSwap?.card
         delete cardSelected.cardToSwap
 
@@ -369,9 +370,52 @@ const handleGameCardPlay = async (
         gameInfoEdit.player_cards_current.push(cardToSwap)
     }
 
+    // CHECK IF CARD IS A MUSTER
+    if (cardSelected?.ability?.includes('muster')) {
+        let currentCardsUpdate = []
+        let deckCardsUpdate = []
+
+        let musterCardsArr = []
+
+        const fetchMusterId = cardSelected?.fetchMusterId
+
+        // check for all muster_fetch cards in the deck and in the currents cards
+        gameInfoEdit.player_cards_current.map((item) => {
+            if (
+                item?.ability?.includes('muster') &&
+                fetchMusterId?.includes(+item?.id)
+            ) {
+                musterCardsArr.push(item)
+            } else {
+                currentCardsUpdate.push(item)
+            }
+        })
+        gameInfoEdit.player_cards_current = currentCardsUpdate
+
+        gameInfoEdit.player_cards_not_played.map((item) => {
+            if (
+                item?.ability?.includes('muster') &&
+                fetchMusterId?.includes(+item?.id)
+            ) {
+                musterCardsArr.push(item)
+            } else {
+                deckCardsUpdate.push(item)
+            }
+        })
+        gameInfoEdit.player_cards_not_played = deckCardsUpdate
+
+        gameInfoEdit.player_cards_board[
+            cardSelected?.row === 'close'
+                ? 0
+                : cardSelected?.row === 'ranged'
+                ? 1
+                : 2
+        ].board_row_cards.push(...musterCardsArr)
+    }
+
     // CHECK IF CARD IS A MEDIC
     let isMedic = false
-    if (cardSelected?.ability.includes('medic')) {
+    if (cardSelected?.ability?.includes('medic')) {
         isMedic = true
     }
 
